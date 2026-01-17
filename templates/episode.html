@@ -19,27 +19,37 @@
     }
     
     .video-header {
-        padding: 1.5rem 2rem;
+        padding: 1rem 1.5rem;
         background: rgba(99, 102, 241, 0.05);
         border-bottom: 1px solid var(--border-color);
     }
     
     .video-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
         color: var(--text-primary);
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.5rem;
+        line-height: 1.4;
+    }
+    
+    .video-title i {
+        font-size: 1rem;
+        flex-shrink: 0;
     }
     
     .video-time {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: var(--text-secondary);
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
+    }
+    
+    .video-time i {
+        font-size: 0.8rem;
     }
     
     .video-player {
@@ -349,11 +359,19 @@
     
     @media (max-width: 768px) {
         .video-header {
-            padding: 1.25rem 1.5rem;
+            padding: 0.875rem 1.25rem;
         }
         
         .video-title {
-            font-size: 1.4rem;
+            font-size: 1rem;
+        }
+        
+        .video-title i {
+            font-size: 0.95rem;
+        }
+        
+        .video-time {
+            font-size: 0.8rem;
         }
         
         .navigation-buttons {
@@ -381,6 +399,22 @@
     }
     
     @media (max-width: 480px) {
+        .video-header {
+            padding: 0.75rem 1rem;
+        }
+        
+        .video-title {
+            font-size: 0.95rem;
+        }
+        
+        .video-title i {
+            font-size: 0.9rem;
+        }
+        
+        .video-time {
+            font-size: 0.75rem;
+        }
+        
         .navigation-buttons {
             padding: 1rem;
         }
@@ -407,7 +441,7 @@
             <div class="video-header">
                 <h1 class="video-title">
                     <i class="fas fa-play-circle"></i>
-                    {{ episode.title }}
+                    <span>{{ episode.title }}</span>
                 </h1>
                 <div class="video-time">
                     <i class="fas fa-clock"></i>
