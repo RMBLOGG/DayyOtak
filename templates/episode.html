@@ -478,33 +478,6 @@
         </div>
         {% endif %}
         
-        {% if episode.downloadUrl and episode.downloadUrl.qualities %}
-        <div class="download-section">
-            <h2 class="section-title-ep">
-                <i class="fas fa-download"></i>
-                Download Episode
-            </h2>
-            
-            {% for quality in episode.downloadUrl.qualities %}
-            <div class="download-quality">
-                <div class="download-quality-title">
-                    <i class="fas fa-hdd"></i>
-                    {{ quality.title }}
-                    <span class="quality-size">{{ quality.size }}</span>
-                </div>
-                <div class="download-links">
-                    {% for link in quality.urls %}
-                    <a href="{{ link.url }}" class="download-link" target="_blank">
-                        <i class="fas fa-download"></i>
-                        {{ link.title }}
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        
         <!-- Info Section -->
         {% if episode.info %}
         <div class="info-section">
@@ -571,6 +544,33 @@
                 </a>
                 {% endfor %}
             </div>
+        </div>
+        {% endif %}
+        
+        {% if episode.downloadUrl and episode.downloadUrl.qualities %}
+        <div class="download-section">
+            <h2 class="section-title-ep">
+                <i class="fas fa-download"></i>
+                Download Episode
+            </h2>
+            
+            {% for quality in episode.downloadUrl.qualities %}
+            <div class="download-quality">
+                <div class="download-quality-title">
+                    <i class="fas fa-hdd"></i>
+                    {{ quality.title }}
+                    <span class="quality-size">{{ quality.size }}</span>
+                </div>
+                <div class="download-links">
+                    {% for link in quality.urls %}
+                    <a href="{{ link.url }}" class="download-link" target="_blank">
+                        <i class="fas fa-download"></i>
+                        {{ link.title }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
         {% endif %}
         
