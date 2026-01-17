@@ -210,31 +210,57 @@ window.DayystreamBookmarks = {
         }
         
         grid.innerHTML = bookmarks.map(anime => `
-            <a href="/anime/${anime.animeId}" class="card-link">
-                <div class="anime-card">
-                    <div class="anime-poster">
-                        <img src="${anime.poster}" alt="${anime.title}" loading="lazy">
-                    </div>
-                    <div class="anime-info">
-                        <div class="anime-title">${anime.title}</div>
-                        <div class="anime-meta">
-                            ${anime.score ? `
-                                <span class="meta-item">
-                                    <i class="fas fa-star"></i>
-                                    ${anime.score}
-                                </span>
-                            ` : ''}
-                            ${anime.type ? `
-                                <span class="meta-item">
-                                    <i class="fas fa-tv"></i>
-                                    ${anime.type}
-                                </span>
-                            ` : ''}
+            <div class="bookmark-item">
+                <a href="/anime/${anime.animeId}" class="card-link">
+                    <div class="anime-card">
+                        <div class="anime-poster">
+                            <img src="${anime.poster}" alt="${anime.title}" loading="lazy">
+                        </div>
+                        <div class="anime-info">
+                            <div class="anime-title">${anime.title}</div>
+                            <div class="anime-meta">
+                                ${anime.score ? `
+                                    <span class="meta-item">
+                                        <i class="fas fa-star"></i>
+                                        ${anime.score}
+                                    </span>
+                                ` : ''}
+                                ${anime.type ? `
+                                    <span class="meta-item">
+                                        <i class="fas fa-tv"></i>
+                                        ${anime.type}
+                                    </span>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </a>
+                </a>
+                <button class="remove-bookmark-btn" onclick="window.DayystreamBookmarks.removeWithConfirm('${anime.animeId}', '${anime.title.replace(/'/g, "\\'")}')" title="Remove from bookmarks">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         `).join('');
+    },
+    
+    /**
+     * Remove bookmark with confirmation
+     */
+    removeWithConfirm(animeId, animeTitle) {
+        showConfirmDialog(
+            'Remove Bookmark?',
+            `Remove "${animeTitle}" from your bookmarks?`,
+            'warning',
+            () => {
+                const result = this.remove(animeId);
+                if (result.success) {
+                    showToast('Bookmark removed', 'success');
+                    // Re-render the page
+                    this.renderBookmarksPage();
+                } else {
+                    showToast('Failed to remove bookmark', 'error');
+                }
+            }
+        );
     },
     
     /**
@@ -644,6 +670,63 @@ if (!document.getElementById('bookmark-styles')) {
         .confirm-btn-confirm:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+        
+        /* Bookmark Item Wrapper */
+        .bookmark-item {
+            position: relative;
+        }
+        
+        .bookmark-item .card-link {
+            display: block;
+        }
+        
+        .remove-bookmark-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.9);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+        
+        .bookmark-item:hover .remove-bookmark-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .remove-bookmark-btn:hover {
+            background: rgba(239, 68, 68, 1);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+        }
+        
+        .remove-bookmark-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .remove-bookmark-btn i {
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            /* Always show remove button on mobile */
+            .remove-bookmark-btn {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     `;
     document.head.appendChild(style);
