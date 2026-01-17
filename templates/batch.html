@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}Batch Download - {{ data.data.title if data and data.status == 'success' else 'Anime' }} - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .batch-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        margin-bottom: 2rem;
+    }
+    
+    .back-btn:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateX(-5px);
+    }
+    
+    .batch-hero {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 2.5rem;
+    }
+    
+    .batch-poster {
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        border: 2px solid var(--border-color);
+    }
+    
+    .batch-poster img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .batch-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .batch-title {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--text-primary);
+    }
+    
+    .batch-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+    
+    .batch-meta-item {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 0.875rem;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .batch-meta-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    .batch-meta-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .format-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .format-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .quality-section-batch {
+        margin-bottom: 2.5rem;
+    }
+    
+    .quality-section-batch:last-child {
+        margin-bottom: 0;
+    }
+    
+    .quality-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        padding: 1.25rem 1.75rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .quality-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .quality-size {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    
+    .download-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .download-btn {
+        padding: 1.25rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: var(--transition);
+        text-align: center;
+    }
+    
+    .download-btn:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    @media (max-width: 768px) {
+        .batch-hero {
+            grid-template-columns: 1fr;
+        }
+        
+        .batch-title {
+            font-size: 1.5rem;
+        }
+        
+        .download-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="batch-container">
+    <a href="javascript:history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        Back
+    </a>
+    
+    {% if data and data.status == 'success' %}
+        {% set batch = data.data %}
+        
+        <div class="batch-hero">
+            <div class="batch-poster">
+                <img src="{{ batch.poster }}" alt="{{ batch.title }}">
+            </div>
+            
+            <div class="batch-info">
+                <h1 class="batch-title">{{ batch.title }}</h1>
+                
+                {% if batch.japanese %}
+                <p style="font-size: 1rem; color: var(--text-secondary);">{{ batch.japanese }}</p>
+                {% endif %}
+                
+                <div class="batch-meta-grid">
+                    {% if batch.type %}
+                    <div class="batch-meta-item">
+                        <div class="batch-meta-label">Type</div>
+                        <div class="batch-meta-value">{{ batch.type }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if batch.score %}
+                    <div class="batch-meta-item">
+                        <div class="batch-meta-label">Score</div>
+                        <div class="batch-meta-value">⭐ {{ batch.score }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if batch.episodes %}
+                    <div class="batch-meta-item">
+                        <div class="batch-meta-label">Episodes</div>
+                        <div class="batch-meta-value">{{ batch.episodes }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if batch.duration %}
+                    <div class="batch-meta-item">
+                        <div class="batch-meta-label">Duration</div>
+                        <div class="batch-meta-value">{{ batch.duration }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if batch.studios %}
+                    <div class="batch-meta-item">
+                        <div class="batch-meta-label">Studio</div>
+                        <div class="batch-meta-value">{{ batch.studios }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if batch.genreList %}
+                <div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Genres:</div>
+                    <div class="genre-list">
+                        {% for genre in batch.genreList %}
+                        <span class="genre-tag">{{ genre.title }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if batch.downloadUrl and batch.downloadUrl.formats %}
+            {% for format in batch.downloadUrl.formats %}
+            <div class="format-section">
+                <h2 class="format-title">
+                    <i class="fas fa-archive"></i>
+                    {{ format.title }}
+                </h2>
+                
+                {% for quality in format.qualities %}
+                <div class="quality-section-batch">
+                    <div class="quality-header">
+                        <div class="quality-name">{{ quality.title }}</div>
+                        <div class="quality-size">{{ quality.size }}</div>
+                    </div>
+                    
+                    <div class="download-grid">
+                        {% for url in quality.urls %}
+                        <a href="{{ url.url }}" class="download-btn" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-download"></i>
+                            {{ url.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="error">
+                <h3><i class="fas fa-info-circle"></i> No Download Links Available</h3>
+                <p>Batch download for this anime is not available yet.</p>
+            </div>
+        {% endif %}
+        
+    {% else %}
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Batch Download</h3>
+            <p>{{ data.message if data else 'Unable to fetch batch download data. Please try again later.' }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

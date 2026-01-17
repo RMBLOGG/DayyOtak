@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}{{ genre_name }} - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .genre-detail-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .genre-header {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        text-align: center;
+    }
+    
+    .genre-title-main {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .genre-count {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .back-btn-genre {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        margin-bottom: 2rem;
+    }
+    
+    .back-btn-genre:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateX(-5px);
+    }
+    
+    .genre-anime-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-color);
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 1.5rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .genre-anime-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-color);
+    }
+    
+    .genre-anime-poster {
+        width: 180px;
+        height: 250px;
+        object-fit: cover;
+    }
+    
+    .genre-anime-info {
+        padding: 1.5rem 1.5rem 1.5rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .genre-anime-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .genre-anime-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .genre-anime-meta-item {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .genre-anime-genres {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .genre-anime-genre-tag {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 0.35rem 0.85rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+        .genre-anime-card {
+            grid-template-columns: 1fr;
+        }
+        
+        .genre-anime-poster {
+            width: 100%;
+            height: 280px;
+        }
+        
+        .genre-anime-info {
+            padding: 1.5rem;
+        }
+        
+        .genre-title-main {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="genre-detail-container">
+    <a href="/genres" class="back-btn-genre">
+        <i class="fas fa-arrow-left"></i>
+        Back to Genres
+    </a>
+    
+    <div class="genre-header">
+        <h1 class="genre-title-main">{{ genre_name }}</h1>
+        {% if data and data.status == 'success' %}
+        <p class="genre-count">
+            <i class="fas fa-film"></i>
+            {{ data.data.animeList|length }} Anime Available
+        </p>
+        {% endif %}
+    </div>
+    
+    {% if data and data.status == 'success' %}
+        {% if data.data.animeList %}
+            {% for anime in data.data.animeList %}
+            <div class="genre-anime-card" onclick="goToAnime('{{ anime.animeId }}')">
+                <img src="{{ anime.poster }}" alt="{{ anime.title }}" class="genre-anime-poster" loading="lazy">
+                <div class="genre-anime-info">
+                    <div class="genre-anime-title">{{ anime.title }}</div>
+                    
+                    <div class="genre-anime-meta">
+                        {% if anime.studios %}
+                        <div class="genre-anime-meta-item">
+                            <i class="fas fa-building"></i>
+                            {{ anime.studios }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.score %}
+                        <div class="genre-anime-meta-item">
+                            <i class="fas fa-star"></i>
+                            {{ anime.score }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.episodes %}
+                        <div class="genre-anime-meta-item">
+                            <i class="fas fa-film"></i>
+                            {{ anime.episodes }} Episodes
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.season %}
+                        <div class="genre-anime-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            {{ anime.season }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if anime.genreList %}
+                    <div class="genre-anime-genres">
+                        {% for genre in anime.genreList %}
+                        <span class="genre-anime-genre-tag">{{ genre.title }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="error">
+                <h3><i class="fas fa-info-circle"></i> No Anime Found</h3>
+                <p>There are no anime available for this genre yet.</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Genre</h3>
+            <p>{{ data.message if data else 'Unable to fetch genre data. Please try again later.' }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

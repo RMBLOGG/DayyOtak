@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+        border: 1px solid var(--border-color);
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+    
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .stat-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+        text-align: center;
+        transition: var(--transition);
+    }
+    
+    .stat-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        color: var(--primary-color);
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">Welcome to AnimeStream</h1>
+    <p class="hero-subtitle">Discover and stream your favorite anime series in high quality</p>
+    
+    <div class="quick-stats">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-fire"></i></div>
+            <div class="stat-value">{{ data.data.ongoing.animeList|length if data and data.status == 'success' else '0' }}</div>
+            <div class="stat-label">Ongoing Series</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-value">{{ data.data.completed.animeList|length if data and data.status == 'success' else '0' }}</div>
+            <div class="stat-label">Completed Series</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-star"></i></div>
+            <div class="stat-value">4.8</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+    </div>
+</div>
+
+{% if data and data.status == 'success' %}
+    <section class="anime-section">
+        <h2 class="section-title">
+            <i class="fas fa-fire"></i>
+            Ongoing Anime
+        </h2>
+        <div class="anime-grid">
+            {% for anime in data.data.ongoing.animeList %}
+            <div class="anime-card" onclick="goToAnime('{{ anime.animeId }}')">
+                <img src="{{ anime.poster }}" alt="{{ anime.title }}" loading="lazy">
+                <div class="anime-info">
+                    <div class="anime-title">{{ anime.title }}</div>
+                    <div class="anime-meta">
+                        <span><i class="fas fa-film"></i> Ep {{ anime.episodes }}</span>
+                        <span class="badge">{{ anime.releaseDay }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <section class="anime-section">
+        <h2 class="section-title">
+            <i class="fas fa-check-circle"></i>
+            Completed Anime
+        </h2>
+        <div class="anime-grid">
+            {% for anime in data.data.completed.animeList %}
+            <div class="anime-card" onclick="goToAnime('{{ anime.animeId }}')">
+                <img src="{{ anime.poster }}" alt="{{ anime.title }}" loading="lazy">
+                <div class="anime-info">
+                    <div class="anime-title">{{ anime.title }}</div>
+                    <div class="anime-meta">
+                        <span><i class="fas fa-film"></i> {{ anime.episodes }} Eps</span>
+                        <span class="badge"><i class="fas fa-star"></i> {{ anime.score }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+{% else %}
+    <div class="error">
+        <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Data</h3>
+        <p>{{ data.message if data else 'Unable to fetch anime data. Please try again later.' }}</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Search: {{ keyword }} - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+    
+    .search-result-header {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .search-keyword {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .search-count {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Grid Layout seperti Homepage */
+    .search-results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .search-anime-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        transition: var(--transition);
+        cursor: pointer;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+    
+    .search-anime-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent 60%);
+        opacity: 0;
+        transition: var(--transition);
+        z-index: 1;
+    }
+    
+    .search-anime-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-color);
+    }
+    
+    .search-anime-card:hover::before {
+        opacity: 1;
+    }
+    
+    .search-anime-card img {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+        display: block;
+        transition: var(--transition);
+    }
+    
+    .search-anime-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .search-anime-info {
+        padding: 1rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .search-anime-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+        color: var(--text-primary);
+    }
+    
+    .search-anime-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        gap: 0.5rem;
+    }
+    
+    .search-status-badge {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .search-score {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+    }
+    
+    .no-results-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+    
+    .no-results h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+    
+    .no-results p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .search-result-header {
+            padding: 1.5rem;
+        }
+        
+        .search-keyword {
+            font-size: 1.4rem;
+        }
+        
+        .search-results-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        
+        .search-anime-card img {
+            height: 200px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .search-results-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-result-header">
+        <div class="search-keyword">
+            <i class="fas fa-search"></i>
+            Search Results for "{{ keyword }}"
+        </div>
+        <div class="search-count">
+            {% if data and data.status == 'success' %}
+                <i class="fas fa-film"></i>
+                Found {{ data.data.animeList|length }} anime
+            {% else %}
+                <i class="fas fa-info-circle"></i>
+                No results found
+            {% endif %}
+        </div>
+    </div>
+
+    {% if data and data.status == 'success' %}
+        {% if data.data.animeList %}
+            <div class="search-results-grid">
+                {% for anime in data.data.animeList %}
+                <div class="search-anime-card" onclick="goToAnime('{{ anime.animeId }}')">
+                    <img src="{{ anime.poster }}" alt="{{ anime.title }}" loading="lazy">
+                    <div class="search-anime-info">
+                        <div class="search-anime-title">{{ anime.title }}</div>
+                        <div class="search-anime-meta">
+                            {% if anime.score %}
+                            <span class="search-score">
+                                <i class="fas fa-star"></i> {{ anime.score }}
+                            </span>
+                            {% endif %}
+                            {% if anime.status %}
+                            <span class="search-status-badge">{{ anime.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-results">
+                <div class="no-results-icon">
+                    <i class="fas fa-search-minus"></i>
+                </div>
+                <h2>No Results Found</h2>
+                <p>Anime with keyword "{{ keyword }}" not found.</p>
+                <p style="margin-top: 1rem;">Try using different keywords or check your spelling.</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Search Results</h3>
+            <p>{{ data.message if data else 'Unable to search anime. Please try again later.' }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

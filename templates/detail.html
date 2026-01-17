@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.data.title if data and data.status == 'success' else 'Anime Detail' }} - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .detail-hero {
+        position: relative;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .detail-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 300px;
+        background-size: cover;
+        background-position: center;
+        filter: blur(20px);
+        opacity: 0.3;
+        z-index: 0;
+    }
+    
+    .detail-content {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2.5rem;
+        padding: 2rem;
+    }
+    
+    .detail-poster-wrapper {
+        position: relative;
+    }
+    
+    .detail-poster {
+        width: 100%;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+        border: 2px solid var(--border-color);
+    }
+    
+    .detail-poster img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .detail-rating {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-md);
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .detail-info {
+        padding-top: 1rem;
+    }
+    
+    .detail-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+    
+    .detail-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .meta-card {
+        background: rgba(99, 102, 241, 0.05);
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+    }
+    
+    .meta-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .meta-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .detail-synopsis {
+        background: rgba(255, 255, 255, 0.02);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+        line-height: 1.7;
+    }
+    
+    .synopsis-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-primary {
+        flex: 1;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-decoration: none;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-secondary {
+        padding: 1rem 2rem;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-decoration: none;
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    /* Bookmark Button Styles */
+    .btn-bookmark {
+        padding: 1rem 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-bookmark:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-bookmark.bookmarked {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .btn-bookmark.bookmarked:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+    }
+    
+    .btn-bookmark:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .btn-bookmark i {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-bookmark:hover i {
+        transform: scale(1.1);
+    }
+    
+    .btn-bookmark.bookmarked i {
+        animation: bookmarkPulse 0.5s ease;
+    }
+    
+    @keyframes bookmarkPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }
+    
+    .section-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .section-header i {
+        color: var(--primary-color);
+    }
+    
+    .episode-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+    
+    .episode-card {
+        background: var(--bg-secondary);
+        padding: 1.25rem;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+    }
+    
+    .episode-card:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        transform: translateY(-5px);
+    }
+    
+    .episode-number {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    .episode-date {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+    
+    @media (max-width: 768px) {
+        .detail-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .detail-title {
+            font-size: 1.8rem;
+        }
+        
+        .detail-meta-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .episode-grid {
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-primary,
+        .btn-secondary,
+        .btn-bookmark {
+            flex: 1;
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container" data-anime-id="{{ anime_id }}">
+    {% if data and data.status == 'success' %}
+        {% set anime = data.data %}
+        
+        <div class="detail-hero">
+            <div class="detail-backdrop" style="background-image: url('{{ anime.poster }}');"></div>
+            
+            <div class="detail-content">
+                <div class="detail-poster-wrapper">
+                    <div class="detail-poster">
+                        <img src="{{ anime.poster }}" alt="{{ anime.title }}" class="anime-poster">
+                    </div>
+                    {% if anime.score %}
+                    <div class="detail-rating anime-rating">
+                        <i class="fas fa-star"></i>
+                        {{ anime.score }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="detail-info">
+                    <h1 class="detail-title anime-title">{{ anime.title }}</h1>
+                    
+                    {% if anime.japanese %}
+                    <p class="detail-subtitle">{{ anime.japanese }}</p>
+                    {% endif %}
+                    
+                    <div class="detail-meta-grid">
+                        {% if anime.status %}
+                        <div class="meta-card">
+                            <div class="meta-label">Status</div>
+                            <div class="meta-value anime-status">
+                                <i class="fas fa-info-circle"></i>
+                                {{ anime.status }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.total_episode or anime.episodes %}
+                        <div class="meta-card">
+                            <div class="meta-label">Episodes</div>
+                            <div class="meta-value anime-episodes">
+                                <i class="fas fa-film"></i>
+                                {{ anime.total_episode or anime.episodes }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.duration %}
+                        <div class="meta-card">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">
+                                <i class="fas fa-clock"></i>
+                                {{ anime.duration }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.type %}
+                        <div class="meta-card">
+                            <div class="meta-label">Type</div>
+                            <div class="meta-value">
+                                <i class="fas fa-tv"></i>
+                                {{ anime.type }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.studio or anime.studios %}
+                        <div class="meta-card">
+                            <div class="meta-label">Studio</div>
+                            <div class="meta-value">
+                                <i class="fas fa-building"></i>
+                                {{ anime.studio or anime.studios }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime.release_date or anime.aired %}
+                        <div class="meta-card">
+                            <div class="meta-label">Released</div>
+                            <div class="meta-value">
+                                <i class="fas fa-calendar"></i>
+                                {{ anime.release_date or anime.aired }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if anime.genres or anime.genreList %}
+                    <div>
+                        <div class="meta-label" style="margin-bottom: 0.75rem;">Genres</div>
+                        <div class="genre-list">
+                            {% if anime.genres %}
+                                {% for genre in anime.genres %}
+                                <span class="genre-tag">{{ genre.name }}</span>
+                                {% endfor %}
+                            {% elif anime.genreList %}
+                                {% for genre in anime.genreList %}
+                                <span class="genre-tag">{{ genre.title }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if anime.synopsis %}
+                    <div class="detail-synopsis">
+                        <div class="synopsis-title">
+                            <i class="fas fa-align-left"></i>
+                            Synopsis
+                        </div>
+                        {% if anime.synopsis is string %}
+                            {{ anime.synopsis }}
+                        {% elif anime.synopsis.paragraphs %}
+                            {% for para in anime.synopsis.paragraphs %}
+                                {{ para }}<br><br>
+                            {% endfor %}
+                        {% else %}
+                            Synopsis not available
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="action-buttons">
+                        {% if anime.episodeList and anime.episodeList|length > 0 %}
+                        <a href="/episode/{{ anime.episodeList[0].episodeId }}" class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Watch Now
+                        </a>
+                        {% endif %}
+                        
+                        <!-- BOOKMARK BUTTON -->
+                        <button class="btn-bookmark" id="bookmarkBtn" onclick="toggleBookmark()">
+                            <i class="far fa-bookmark"></i>
+                            <span id="bookmarkText">Add Bookmark</span>
+                        </button>
+                        
+                        {% if anime.animeId %}
+                        <a href="/batch/{{ anime.animeId }}" class="btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if anime.episodeList %}
+        <div class="section-card">
+            <h2 class="section-header">
+                <i class="fas fa-list-ul"></i>
+                Episodes
+            </h2>
+            <div class="episode-grid">
+                {% for episode in anime.episodeList %}
+                <div class="episode-card" onclick="goToEpisode('{{ episode.episodeId }}')">
+                    <div class="episode-number">
+                        <i class="fas fa-play-circle"></i> {{ episode.eps }}
+                    </div>
+                    <div class="episode-date">{{ episode.date }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if anime.recommendedAnimeList %}
+        <div class="section-card">
+            <h2 class="section-header">
+                <i class="fas fa-thumbs-up"></i>
+                Recommended Anime
+            </h2>
+            <div class="anime-grid">
+                {% for rec in anime.recommendedAnimeList %}
+                <div class="anime-card" onclick="goToAnime('{{ rec.animeId }}')">
+                    <img src="{{ rec.poster }}" alt="{{ rec.title }}" loading="lazy">
+                    <div class="anime-info">
+                        <div class="anime-title">{{ rec.title }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+    {% else %}
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Anime Details</h3>
+            <p>{{ data.message if data else 'Unable to fetch anime data. Please try again later.' }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Load Bookmark Helper -->
+<script src="{{ url_for('static', filename='js/bookmark.js') }}"></script>
+{% endblock %}

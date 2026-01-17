@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}All Anime A-Z - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .all-anime-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .alphabet-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        position: sticky;
+        top: var(--topbar-height);
+        z-index: 100;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .alphabet-btn {
+        padding: 0.75rem 1.25rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+        min-width: 50px;
+        text-align: center;
+        font-size: 1rem;
+    }
+    
+    .alphabet-btn:hover {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-color: transparent;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .letter-section {
+        margin-bottom: 3rem;
+        scroll-margin-top: 150px;
+    }
+    
+    .letter-header {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        padding: 1.25rem 2rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: var(--radius-md);
+        min-width: 120px;
+        justify-content: center;
+        box-shadow: var(--shadow-md);
+        color: white;
+    }
+    
+    .anime-count {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    .anime-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .anime-list-item {
+        background: var(--bg-secondary);
+        padding: 1.25rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .anime-list-item:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        transform: translateX(8px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .anime-list-item::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .alphabet-nav {
+            gap: 0.5rem;
+            padding: 1.5rem;
+        }
+        
+        .alphabet-btn {
+            padding: 0.6rem 1rem;
+            min-width: 45px;
+            font-size: 0.9rem;
+        }
+        
+        .anime-list {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+        
+        .letter-header {
+            font-size: 2rem;
+            padding: 1rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="all-anime-container">
+    <h1 class="section-title">
+        <i class="fas fa-list"></i>
+        All Anime (A-Z)
+    </h1>
+    
+    {% if data and data.status == 'success' %}
+        <div class="alphabet-nav">
+            {% for section in data.data.list %}
+            <a href="#letter-{{ section.startWith }}" class="alphabet-btn">{{ section.startWith }}</a>
+            {% endfor %}
+        </div>
+        
+        {% for section in data.data.list %}
+        <div class="letter-section" id="letter-{{ section.startWith }}">
+            <div class="letter-header">
+                {{ section.startWith }}
+                <span class="anime-count">{{ section.animeList|length }}</span>
+            </div>
+            
+            <div class="anime-list">
+                {% for anime in section.animeList %}
+                <div class="anime-list-item" onclick="goToAnime('{{ anime.animeId }}')">
+                    {{ anime.title }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Anime List</h3>
+            <p>{{ data.message if data else 'Unable to fetch anime data. Please try again later.' }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

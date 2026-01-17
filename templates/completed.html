@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Completed Anime - AnimeStream{% endblock %}
+
+{% block content %}
+<h1 class="section-title">
+    <i class="fas fa-check-circle"></i>
+    Completed Anime
+</h1>
+
+{% if data and data.status == 'success' %}
+    {% if data.pagination %}
+    <div class="page-info">
+        <i class="fas fa-info-circle"></i>
+        Page {{ data.pagination.currentPage }} of {{ data.pagination.totalPages }}
+    </div>
+    {% endif %}
+    
+    <div class="anime-grid">
+        {% for anime in data.data.animeList %}
+        <div class="anime-card" onclick="goToAnime('{{ anime.animeId }}')">
+            <img src="{{ anime.poster }}" alt="{{ anime.title }}" loading="lazy">
+            <div class="anime-info">
+                <div class="anime-title">{{ anime.title }}</div>
+                <div class="anime-meta">
+                    <span><i class="fas fa-film"></i> {{ anime.episodes }} Eps</span>
+                    <span class="badge"><i class="fas fa-star"></i> {{ anime.score }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if data.pagination %}
+    <div class="pagination">
+        {% if data.pagination.hasPrevPage %}
+        <a href="/completed?page=1" class="page-btn"><i class="fas fa-angle-double-left"></i> First</a>
+        <a href="/completed?page={{ data.pagination.prevPage }}" class="page-btn"><i class="fas fa-angle-left"></i> Prev</a>
+        {% else %}
+        <span class="page-btn disabled"><i class="fas fa-angle-double-left"></i> First</span>
+        <span class="page-btn disabled"><i class="fas fa-angle-left"></i> Prev</span>
+        {% endif %}
+        
+        {% set current = data.pagination.currentPage %}
+        {% set total = data.pagination.totalPages %}
+        
+        {% if current > 2 %}
+        <a href="/completed?page={{ current - 1 }}" class="page-btn">{{ current - 1 }}</a>
+        {% endif %}
+        
+        <span class="page-btn active">{{ current }}</span>
+        
+        {% if current < total - 1 %}
+        <a href="/completed?page={{ current + 1 }}" class="page-btn">{{ current + 1 }}</a>
+        {% endif %}
+        
+        {% if data.pagination.hasNextPage %}
+        <a href="/completed?page={{ data.pagination.nextPage }}" class="page-btn">Next <i class="fas fa-angle-right"></i></a>
+        <a href="/completed?page={{ data.pagination.totalPages }}" class="page-btn">Last <i class="fas fa-angle-double-right"></i></a>
+        {% else %}
+        <span class="page-btn disabled">Next <i class="fas fa-angle-right"></i></span>
+        <span class="page-btn disabled">Last <i class="fas fa-angle-double-right"></i></span>
+        {% endif %}
+    </div>
+    {% endif %}
+{% else %}
+    <div class="error">
+        <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Data</h3>
+        <p>{{ data.message if data else 'Unable to fetch anime data. Please try again later.' }}</p>
+    </div>
+{% endif %}
+{% endblock %}

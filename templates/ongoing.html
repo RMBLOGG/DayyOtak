@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Anime Ongoing - AnimeStream{% endblock %}
+
+{% block content %}
+<h1 class="section-title">🔥 Anime Ongoing</h1>
+
+{% if data and data.status == 'success' %}
+    {% if data.pagination %}
+    <div class="page-info">
+        Halaman {{ data.pagination.currentPage }} dari {{ data.pagination.totalPages }}
+    </div>
+    {% endif %}
+    
+    <div class="anime-grid">
+        {% for anime in data.data.animeList %}
+        <div class="anime-card" onclick="goToAnime('{{ anime.animeId }}')">
+            <img src="{{ anime.poster }}" alt="{{ anime.title }}" loading="lazy">
+            <div class="anime-info">
+                <div class="anime-title">{{ anime.title }}</div>
+                <div class="anime-meta">
+                    <span>Ep {{ anime.episodes }}</span>
+                    <span class="badge">{{ anime.releaseDay }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if data.pagination %}
+    <div class="pagination">
+        {% if data.pagination.hasPrevPage %}
+        <a href="/ongoing?page=1" class="page-btn">⏮️ First</a>
+        <a href="/ongoing?page={{ data.pagination.prevPage }}" class="page-btn">⬅️ Prev</a>
+        {% else %}
+        <span class="page-btn disabled">⏮️ First</span>
+        <span class="page-btn disabled">⬅️ Prev</span>
+        {% endif %}
+        
+        {% set current = data.pagination.currentPage %}
+        {% set total = data.pagination.totalPages %}
+        
+        {% if current > 2 %}
+        <a href="/ongoing?page={{ current - 1 }}" class="page-btn">{{ current - 1 }}</a>
+        {% endif %}
+        
+        <span class="page-btn active">{{ current }}</span>
+        
+        {% if current < total - 1 %}
+        <a href="/ongoing?page={{ current + 1 }}" class="page-btn">{{ current + 1 }}</a>
+        {% endif %}
+        
+        {% if data.pagination.hasNextPage %}
+        <a href="/ongoing?page={{ data.pagination.nextPage }}" class="page-btn">Next ➡️</a>
+        <a href="/ongoing?page={{ data.pagination.totalPages }}" class="page-btn">Last ⏭️</a>
+        {% else %}
+        <span class="page-btn disabled">Next ➡️</span>
+        <span class="page-btn disabled">Last ⏭️</span>
+        {% endif %}
+    </div>
+    {% endif %}
+{% else %}
+    <div class="error">
+        <h3>Error Loading Data</h3>
+        <p>{{ data.message if data else 'Unable to fetch anime data' }}</p>
+    </div>
+{% endif %}
+{% endblock %}

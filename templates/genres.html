@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Genres - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .genres-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .genres-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .genres-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .genres-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .genre-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-md);
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .genre-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        transform: scaleX(0);
+        transition: var(--transition);
+    }
+    
+    .genre-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(236, 72, 153, 0.05));
+        opacity: 0;
+        transition: var(--transition);
+    }
+    
+    .genre-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .genre-card:hover::after {
+        opacity: 1;
+    }
+    
+    .genre-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-color);
+    }
+    
+    .genre-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1.25rem;
+        display: block;
+        transition: var(--transition);
+    }
+    
+    .genre-card:hover .genre-icon {
+        transform: scale(1.2) rotate(5deg);
+    }
+    
+    .genre-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        position: relative;
+        z-index: 1;
+    }
+    
+    @media (max-width: 768px) {
+        .genres-grid {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+        
+        .genre-card {
+            padding: 2rem 1rem;
+        }
+        
+        .genre-icon {
+            font-size: 2.5rem;
+        }
+        
+        .genre-name {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="genres-container">
+    <div class="genres-header">
+        <h1 class="section-title" style="justify-content: center;">
+            <i class="fas fa-theater-masks"></i>
+            All Anime Genres
+        </h1>
+        <p class="genres-subtitle">Explore anime by your favorite genres</p>
+    </div>
+    
+    {% if data and data.status == 'success' %}
+        <div class="genres-grid">
+            {% for genre in data.data.genreList %}
+            <div class="genre-card" onclick="goToGenre('{{ genre.genreId }}')">
+                <span class="genre-icon">
+                    {% if genre.title == 'Action' %}⚔️
+                    {% elif genre.title == 'Adventure' %}🗺️
+                    {% elif genre.title == 'Comedy' %}😂
+                    {% elif genre.title == 'Demons' %}👹
+                    {% elif genre.title == 'Drama' %}🎭
+                    {% elif genre.title == 'Ecchi' %}💋
+                    {% elif genre.title == 'Fantasy' %}🔮
+                    {% elif genre.title == 'Game' %}🎮
+                    {% elif genre.title == 'Harem' %}💕
+                    {% elif genre.title == 'Historical' %}🏛️
+                    {% elif genre.title == 'Horror' %}👻
+                    {% elif genre.title == 'Josei' %}👩
+                    {% elif genre.title == 'Magic' %}✨
+                    {% elif genre.title == 'Martial Arts' %}🥋
+                    {% elif genre.title == 'Mecha' %}🤖
+                    {% elif genre.title == 'Military' %}🎖️
+                    {% elif genre.title == 'Music' %}🎵
+                    {% elif genre.title == 'Mystery' %}🔍
+                    {% elif genre.title == 'Psychological' %}🧠
+                    {% elif genre.title == 'Parody' %}🤪
+                    {% elif genre.title == 'Police' %}👮
+                    {% elif genre.title == 'Romance' %}❤️
+                    {% elif genre.title == 'Samurai' %}⚔️
+                    {% elif genre.title == 'School' %}🏫
+                    {% elif genre.title == 'Sci-Fi' %}🚀
+                    {% elif genre.title == 'Seinen' %}👨
+                    {% elif genre.title == 'Shoujo' %}👧
+                    {% elif genre.title == 'Shoujo Ai' %}💖
+                    {% elif genre.title == 'Shounen' %}👦
+                    {% elif genre.title == 'Slice of Life' %}🌸
+                    {% elif genre.title == 'Sports' %}⚽
+                    {% elif genre.title == 'Space' %}🌌
+                    {% elif genre.title == 'Super Power' %}⚡
+                    {% elif genre.title == 'Supernatural' %}🌙
+                    {% elif genre.title == 'Thriller' %}😱
+                    {% elif genre.title == 'Vampire' %}🧛
+                    {% else %}🎬
+                    {% endif %}
+                </span>
+                <div class="genre-name">{{ genre.title }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Genres</h3>
+            <p>{{ data.message if data else 'Unable to fetch genres data. Please try again later.' }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

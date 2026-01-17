@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.data.title if data and data.status == 'success' else 'Episode' }} - AnimeStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    .episode-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .video-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .video-header {
+        padding: 1.5rem 2rem;
+        background: rgba(99, 102, 241, 0.05);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .video-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .video-time {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .video-player {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%;
+        background: #000;
+    }
+    
+    .video-player iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    /* Navigation Buttons - 2 Columns Side by Side */
+    .navigation-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        background: rgba(255, 255, 255, 0.02);
+    }
+    
+    .nav-btn {
+        padding: 1.25rem 2rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+    
+    .nav-btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+    
+    .nav-btn:active:not(:disabled) {
+        transform: translateY(-1px);
+    }
+    
+    .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: var(--bg-secondary);
+        box-shadow: none;
+    }
+    
+    .nav-btn i {
+        font-size: 1.2rem;
+    }
+    
+    .quality-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .section-title-ep {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-title-ep i {
+        color: var(--primary-color);
+    }
+    
+    .quality-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .quality-tab {
+        padding: 0.875rem 1.5rem;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    
+    .quality-tab.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-color: transparent;
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .quality-tab:hover:not(.active) {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .server-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .server-btn {
+        padding: 1.25rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        text-align: center;
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .server-btn:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateY(-3px);
+    }
+    
+    .download-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .download-quality {
+        margin-bottom: 2rem;
+    }
+    
+    .download-quality:last-child {
+        margin-bottom: 0;
+    }
+    
+    .download-quality-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .quality-size {
+        background: rgba(99, 102, 241, 0.15);
+        color: var(--primary-color);
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .download-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .download-link {
+        padding: 1.25rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: var(--radius-sm);
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-align: center;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    
+    .download-link:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    @media (max-width: 768px) {
+        .video-header {
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .video-title {
+            font-size: 1.4rem;
+        }
+        
+        .navigation-buttons {
+            padding: 1.25rem 1.5rem;
+            gap: 0.75rem;
+        }
+        
+        .nav-btn {
+            padding: 1rem 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .quality-tabs {
+            font-size: 0.9rem;
+        }
+        
+        .server-list,
+        .download-links {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .navigation-buttons {
+            padding: 1rem;
+        }
+        
+        .nav-btn {
+            padding: 0.875rem 1rem;
+            font-size: 0.85rem;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn i {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="episode-container">
+    {% if data and data.status == 'success' %}
+        {% set episode = data.data %}
+        
+        <div class="video-section">
+            <div class="video-header">
+                <h1 class="video-title">
+                    <i class="fas fa-play-circle"></i>
+                    {{ episode.title }}
+                </h1>
+                <div class="video-time">
+                    <i class="fas fa-clock"></i>
+                    {{ episode.releaseTime }}
+                </div>
+            </div>
+            
+            <div class="video-player" id="videoPlayer">
+                <iframe src="{{ episode.defaultStreamingUrl }}" allowfullscreen scrolling="no"></iframe>
+            </div>
+            
+            <!-- Navigation Buttons - Side by Side -->
+            <div class="navigation-buttons">
+                {% if episode.hasPrevEpisode %}
+                <a href="/episode/{{ episode.prevEpisode.episodeId }}" class="nav-btn">
+                    <i class="fas fa-chevron-left"></i>
+                    <span>Prev</span>
+                </a>
+                {% else %}
+                <button class="nav-btn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                    <span>Prev</span>
+                </button>
+                {% endif %}
+                
+                {% if episode.hasNextEpisode %}
+                <a href="/episode/{{ episode.nextEpisode.episodeId }}" class="nav-btn">
+                    <span>Next</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% else %}
+                <button class="nav-btn" disabled>
+                    <span>Next</span>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if episode.server and episode.server.qualities %}
+        <div class="quality-section">
+            <h2 class="section-title-ep">
+                <i class="fas fa-server"></i>
+                Streaming Servers
+            </h2>
+            
+            <div class="quality-tabs">
+                {% for quality in episode.server.qualities %}
+                    {% if quality.serverList %}
+                    <div class="quality-tab" onclick="showServers('{{ quality.title }}')">
+                        {{ quality.title }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            {% for quality in episode.server.qualities %}
+                {% if quality.serverList %}
+                <div id="servers-{{ quality.title }}" class="server-list" style="display: none;">
+                    {% for server in quality.serverList %}
+                    <div class="server-btn" onclick="changeServer('{{ server.serverId }}', '{{ server.title }}')">
+                        <i class="fas fa-play"></i>
+                        {{ server.title }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if episode.downloadUrl and episode.downloadUrl.qualities %}
+        <div class="download-section">
+            <h2 class="section-title-ep">
+                <i class="fas fa-download"></i>
+                Download Episode
+            </h2>
+            
+            {% for quality in episode.downloadUrl.qualities %}
+            <div class="download-quality">
+                <div class="download-quality-title">
+                    <i class="fas fa-hdd"></i>
+                    {{ quality.title }}
+                    <span class="quality-size">{{ quality.size }}</span>
+                </div>
+                <div class="download-links">
+                    {% for link in quality.urls %}
+                    <a href="{{ link.url }}" class="download-link" target="_blank">
+                        <i class="fas fa-download"></i>
+                        {{ link.title }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+    {% else %}
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Episode</h3>
+            <p>{{ data.message if data else 'Unable to fetch episode data. Please try again later.' }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

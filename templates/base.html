@@ -1,1 +1,204 @@
-
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AnimeStream{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">AnimeStream</div>
+                    <div class="logo-subtitle">Watch & Enjoy</div>
+                </div>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Menu</div>
+                <a href="/" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-home"></i></span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/ongoing" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-fire"></i></span>
+                    <span class="nav-text">Ongoing</span>
+                </a>
+                <a href="/completed" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-check-circle"></i></span>
+                    <span class="nav-text">Completed</span>
+                </a>
+                <a href="/bookmarks" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-bookmark"></i></span>
+                    <span class="nav-text">Bookmarks</span>
+                    <span class="nav-badge" id="sidebarBookmarkCount" style="display: none;">0</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Browse</div>
+                <a href="/all-anime" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-list"></i></span>
+                    <span class="nav-text">All Anime</span>
+                </a>
+                <a href="/genres" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-theater-masks"></i></span>
+                    <span class="nav-text">Genres</span>
+                </a>
+                <a href="/schedule" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+                    <span class="nav-text">Schedule</span>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="theme-toggle" id="themeToggle">
+                <div class="theme-toggle-content">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark Mode</span>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="sidebar-version">v2.0.0</div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation Bar -->
+        <header class="topbar">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="search-wrapper">
+                <form action="/search" method="get" class="search-form" onsubmit="searchAnime(event)">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="q" class="search-input" placeholder="Search anime..." required>
+                </form>
+            </div>
+            
+            <div class="topbar-actions">
+                <button class="action-btn notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Page Content -->
+        <main class="content-wrapper">
+            {% block content %}{% endblock %}
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 AnimeStream. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Notification Dropdown -->
+    <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-header">
+            <h3>Notifications</h3>
+            <button class="notification-close" id="notificationClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">New Episode Available</div>
+                    <div class="notification-text">Mugen Gacha Episode 3 has been released!</div>
+                    <div class="notification-time">5 minutes ago</div>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Popular This Week</div>
+                    <div class="notification-text">Check out the trending anime this week</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Schedule Update</div>
+                    <div class="notification-text">New anime releases scheduled for today</div>
+                    <div class="notification-time">5 hours ago</div>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Recommendation</div>
+                    <div class="notification-text">Based on your watch history, you might like...</div>
+                    <div class="notification-time">1 day ago</div>
+                </div>
+            </div>
+        </div>
+        <div class="notification-footer">
+            <a href="#" class="notification-clear">Clear all notifications</a>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Load bookmark count on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/bookmarks');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const count = result.data.count;
+                    const badge = document.getElementById('sidebarBookmarkCount');
+                    
+                    if (count > 0 && badge) {
+                        badge.textContent = count > 99 ? '99+' : count;
+                        badge.style.display = 'flex';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading bookmark count:', error);
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
