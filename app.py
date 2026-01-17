@@ -11,7 +11,6 @@ API_BASE = "https://www.sankavollerei.com"
 # ============ VERCEL SERVERLESS STORAGE ============
 # Note: Vercel doesn't support SQLite or background tasks
 # Using in-memory storage (will reset on cold start)
-BOOKMARKS = {}
 NOTIFICATIONS = []
 
 # Simple cache for Vercel (in-memory)
@@ -65,81 +64,11 @@ def fetch_api(endpoint, cache_type='home'):
     except requests.exceptions.RequestException as e:
         return {"status": "error", "message": str(e)}
 
-# ============ BOOKMARK ROUTES (In-Memory) ============
+# ============ BOOKMARK PAGE (Client-side with localStorage) ============
 @app.route('/bookmarks')
 def bookmarks():
-    """Bookmarks page"""
-    bookmarks_list = list(BOOKMARKS.values())
-    return render_template('bookmarks.html', bookmarks=bookmarks_list)
-
-@app.route('/api/bookmarks')
-def api_bookmarks():
-    """Get all bookmarks"""
-    bookmarks_list = list(BOOKMARKS.values())
-    return jsonify({
-        'status': 'success',
-        'data': {
-            'bookmarks': bookmarks_list,
-            'count': len(bookmarks_list)
-        }
-    })
-
-@app.route('/api/bookmarks/toggle', methods=['POST'])
-def toggle_bookmark():
-    """Toggle bookmark"""
-    data = request.get_json()
-    anime_id = data.get('anime_id')
-    
-    if not anime_id:
-        return jsonify({'status': 'error', 'message': 'anime_id required'}), 400
-    
-    if anime_id in BOOKMARKS:
-        del BOOKMARKS[anime_id]
-        return jsonify({
-            'status': 'success',
-            'action': 'removed',
-            'message': 'Bookmark removed'
-        })
-    else:
-        BOOKMARKS[anime_id] = {
-            'anime_id': anime_id,
-            'title': data.get('title'),
-            'poster': data.get('poster'),
-            'status': data.get('status'),
-            'rating': data.get('rating'),
-            'total_episode': data.get('total_episode'),
-            'created_at': datetime.now().isoformat()
-        }
-        return jsonify({
-            'status': 'success',
-            'action': 'added',
-            'message': 'Bookmark added'
-        })
-
-@app.route('/api/bookmarks/check/<anime_id>')
-def check_bookmark(anime_id):
-    """Check if bookmarked"""
-    return jsonify({
-        'status': 'success',
-        'data': {'is_bookmarked': anime_id in BOOKMARKS}
-    })
-
-@app.route('/api/bookmarks/remove', methods=['POST'])
-def remove_bookmark():
-    """Remove bookmark"""
-    data = request.get_json()
-    anime_id = data.get('anime_id')
-    
-    if anime_id in BOOKMARKS:
-        del BOOKMARKS[anime_id]
-        return jsonify({'status': 'success', 'message': 'Removed'})
-    return jsonify({'status': 'error', 'message': 'Not found'}), 404
-
-@app.route('/api/bookmarks/clear', methods=['POST'])
-def clear_bookmarks():
-    """Clear all bookmarks"""
-    BOOKMARKS.clear()
-    return jsonify({'status': 'success', 'message': 'Cleared'})
+    """Bookmarks page - using client-side localStorage"""
+    return render_template('bookmarks.html')
 
 # ============ NOTIFICATION ROUTES (In-Memory) ============
 @app.route('/api/notifications')
@@ -159,7 +88,7 @@ def clear_notifications():
     NOTIFICATIONS.clear()
     return jsonify({'status': 'success'})
 
-# ============ ORIGINAL ROUTES ============
+# ============ ANIME ROUTES ============
 @app.route('/')
 def index():
     data = fetch_api('/anime/home', 'home')
@@ -172,6 +101,7 @@ def api_home():
 
 @app.route('/anime/<anime_id>')
 def anime_detail(anime_id):
+    """Anime detail page"""
     data = fetch_api(f'/anime/anime/{anime_id}', 'anime')
     return render_template('detail.html', anime_id=anime_id, data=data)
 
@@ -243,6 +173,7 @@ def api_server(server_id):
 
 @app.route('/batch/<slug>')
 def batch_download(slug):
+    """Batch download page"""
     data = fetch_api(f'/anime/batch/{slug}', 'batch')
     return render_template('batch.html', slug=slug, data=data)
 
@@ -274,4 +205,4 @@ def api_genre_detail(genre_id):
 
 # Vercel needs this
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
