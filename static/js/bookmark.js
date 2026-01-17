@@ -1,73 +1,358 @@
 /**
- * Bookmark Helper Functions
- * Add this script to anime detail pages to enable bookmark functionality
+ * AnimeStream Bookmark System - Client-side with localStorage
+ * Compatible with Vercel deployment (no backend database)
  */
 
+// Namespace untuk bookmark functions
+window.DayystreamBookmarks = {
+    STORAGE_KEY: 'animestream_bookmarks',
+    
+    /**
+     * Get all bookmarks from localStorage
+     */
+    getAll() {
+        try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error('Error reading bookmarks:', error);
+            return [];
+        }
+    },
+    
+    /**
+     * Save bookmarks to localStorage
+     */
+    saveAll(bookmarks) {
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(bookmarks));
+            return true;
+        } catch (error) {
+            console.error('Error saving bookmarks:', error);
+            return false;
+        }
+    },
+    
+    /**
+     * Add bookmark
+     */
+    add(animeData) {
+        const bookmarks = this.getAll();
+        
+        // Check if already exists
+        const exists = bookmarks.some(b => b.animeId === animeData.animeId);
+        if (exists) {
+            return { success: false, message: 'Already bookmarked' };
+        }
+        
+        // Add timestamp
+        animeData.addedAt = new Date().toISOString();
+        
+        bookmarks.push(animeData);
+        
+        if (this.saveAll(bookmarks)) {
+            this.updateCount();
+            return { success: true, message: 'Added to bookmarks' };
+        }
+        
+        return { success: false, message: 'Failed to save' };
+    },
+    
+    /**
+     * Remove bookmark
+     */
+    remove(animeId) {
+        const bookmarks = this.getAll();
+        const filtered = bookmarks.filter(b => b.animeId !== animeId);
+        
+        if (this.saveAll(filtered)) {
+            this.updateCount();
+            return { success: true, message: 'Removed from bookmarks' };
+        }
+        
+        return { success: false, message: 'Failed to remove' };
+    },
+    
+    /**
+     * Toggle bookmark
+     */
+    toggle(animeData) {
+        const bookmarks = this.getAll();
+        const exists = bookmarks.some(b => b.animeId === animeData.animeId);
+        
+        if (exists) {
+            return this.remove(animeData.animeId);
+        } else {
+            return this.add(animeData);
+        }
+    },
+    
+    /**
+     * Check if anime is bookmarked
+     */
+    isBookmarked(animeId) {
+        const bookmarks = this.getAll();
+        return bookmarks.some(b => b.animeId === animeId);
+    },
+    
+    /**
+     * Clear all bookmarks
+     */
+    clearAll() {
+        showConfirmDialog(
+            'Clear All Bookmarks?',
+            'This will remove all your saved anime. This action cannot be undone.',
+            'danger',
+            () => {
+                if (this.saveAll([])) {
+                    this.updateCount();
+                    // Reload page to show empty state
+                    window.location.reload();
+                    showToast('All bookmarks cleared', 'success');
+                } else {
+                    showToast('Failed to clear bookmarks', 'error');
+                }
+            }
+        );
+    },
+    
+    /**
+     * Update bookmark count in sidebar
+     */
+    updateCount() {
+        const count = this.getAll().length;
+        const badge = document.getElementById('sidebarBookmarkCount');
+        const countElement = document.getElementById('bookmarkCount');
+        
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        if (countElement) {
+            countElement.textContent = count;
+        }
+    },
+    
+    /**
+     * Search bookmarks
+     */
+    search(keyword) {
+        const bookmarks = this.getAll();
+        
+        if (!keyword) return bookmarks;
+        
+        const lowerKeyword = keyword.toLowerCase();
+        return bookmarks.filter(anime => 
+            anime.title.toLowerCase().includes(lowerKeyword) ||
+            (anime.status && anime.status.toLowerCase().includes(lowerKeyword)) ||
+            (anime.type && anime.type.toLowerCase().includes(lowerKeyword))
+        );
+    },
+    
+    /**
+     * Sort bookmarks
+     */
+    sort(bookmarks, sortBy) {
+        const sorted = [...bookmarks];
+        
+        switch(sortBy) {
+            case 'newest':
+                return sorted.sort((a, b) => 
+                    new Date(b.addedAt) - new Date(a.addedAt)
+                );
+            case 'oldest':
+                return sorted.sort((a, b) => 
+                    new Date(a.addedAt) - new Date(b.addedAt)
+                );
+            case 'title':
+                return sorted.sort((a, b) => 
+                    a.title.localeCompare(b.title)
+                );
+            case 'title-desc':
+                return sorted.sort((a, b) => 
+                    b.title.localeCompare(a.title)
+                );
+            default:
+                return sorted;
+        }
+    },
+    
+    /**
+     * Render bookmarks to grid
+     */
+    renderBookmarks(bookmarks) {
+        const grid = document.getElementById('bookmarkGrid');
+        const emptyState = document.getElementById('emptyState');
+        const noResults = document.getElementById('noResults');
+        
+        if (!grid) return;
+        
+        // Hide all states first
+        if (emptyState) emptyState.style.display = 'none';
+        if (noResults) noResults.style.display = 'none';
+        
+        if (bookmarks.length === 0) {
+            grid.innerHTML = '';
+            
+            // Check if it's search result or truly empty
+            const searchInput = document.getElementById('searchBookmark');
+            if (searchInput && searchInput.value) {
+                if (noResults) noResults.style.display = 'block';
+            } else {
+                if (emptyState) emptyState.style.display = 'block';
+            }
+            return;
+        }
+        
+        grid.innerHTML = bookmarks.map(anime => `
+            <a href="/anime/${anime.animeId}" class="card-link">
+                <div class="anime-card">
+                    <div class="anime-poster">
+                        <img src="${anime.poster}" alt="${anime.title}" loading="lazy">
+                    </div>
+                    <div class="anime-info">
+                        <div class="anime-title">${anime.title}</div>
+                        <div class="anime-meta">
+                            ${anime.score ? `
+                                <span class="meta-item">
+                                    <i class="fas fa-star"></i>
+                                    ${anime.score}
+                                </span>
+                            ` : ''}
+                            ${anime.type ? `
+                                <span class="meta-item">
+                                    <i class="fas fa-tv"></i>
+                                    ${anime.type}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        `).join('');
+    },
+    
+    /**
+     * Initialize bookmarks page
+     */
+    initBookmarksPage() {
+        const searchInput = document.getElementById('searchBookmark');
+        const sortSelect = document.getElementById('sortBookmark');
+        
+        // Initial render
+        this.renderBookmarksPage();
+        
+        // Search functionality
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                this.renderBookmarksPage();
+            });
+        }
+        
+        // Sort functionality
+        if (sortSelect) {
+            sortSelect.addEventListener('change', () => {
+                this.renderBookmarksPage();
+            });
+        }
+        
+        // Update count
+        this.updateCount();
+    },
+    
+    /**
+     * Render bookmarks page with search and sort
+     */
+    renderBookmarksPage() {
+        const searchInput = document.getElementById('searchBookmark');
+        const sortSelect = document.getElementById('sortBookmark');
+        
+        let bookmarks = this.getAll();
+        
+        // Apply search
+        if (searchInput && searchInput.value) {
+            bookmarks = this.search(searchInput.value);
+        }
+        
+        // Apply sort
+        if (sortSelect) {
+            bookmarks = this.sort(bookmarks, sortSelect.value);
+        }
+        
+        this.renderBookmarks(bookmarks);
+    }
+};
+
 /**
- * Toggle bookmark for current anime
- * Usage: Add this button to your detail page:
- * <button class="bookmark-btn" id="bookmarkBtn" onclick="toggleBookmark()">
- *     <i class="fas fa-bookmark"></i>
- *     <span id="bookmarkText">Add to Bookmarks</span>
- * </button>
+ * Toggle bookmark from detail page - GUNAKAN ONCLICK
  */
-async function toggleBookmark() {
+function toggleBookmark() {
+    console.log('toggleBookmark called!'); // Debug
+    
     const bookmarkBtn = document.getElementById('bookmarkBtn');
+    const bookmarkIcon = document.getElementById('bookmarkIcon');
     const bookmarkText = document.getElementById('bookmarkText');
     
-    if (!bookmarkBtn) return;
+    console.log('Button:', bookmarkBtn); // Debug
+    console.log('Window animeData:', window.animeData); // Debug
     
-    // Get anime data from page (adjust selectors based on your HTML)
-    const animeId = getAnimeId();
-    const animeData = getAnimeData();
-    
-    if (!animeId) {
-        showToast('Error: Anime ID not found', 'error');
+    if (!bookmarkBtn) {
+        console.error('Bookmark button not found!');
         return;
     }
     
-    // Disable button during request
+    // Get anime data from window.animeData (set in detail.html)
+    const animeData = window.animeData;
+    
+    if (!animeData || !animeData.animeId) {
+        console.error('Anime data not found or invalid:', animeData);
+        showToast('Error: Anime data not found', 'error');
+        return;
+    }
+    
+    console.log('Processing bookmark for:', animeData.title);
+    
+    // Disable button
     bookmarkBtn.disabled = true;
     
     try {
-        const response = await fetch('/api/bookmarks/toggle', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                anime_id: animeId,
-                title: animeData.title,
-                poster: animeData.poster,
-                status: animeData.status,
-                rating: animeData.rating,
-                total_episode: animeData.total_episode
-            })
-        });
+        const result = window.DayystreamBookmarks.toggle(animeData);
+        console.log('Toggle result:', result);
         
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            const isAdded = result.action === 'added';
+        if (result.success) {
+            const isBookmarked = window.DayystreamBookmarks.isBookmarked(animeData.animeId);
+            console.log('Is bookmarked:', isBookmarked);
             
             // Update button UI
-            updateBookmarkButton(bookmarkBtn, isAdded);
-            
-            // Update text
-            if (bookmarkText) {
-                bookmarkText.textContent = isAdded ? 'Remove from Bookmarks' : 'Add to Bookmarks';
+            if (isBookmarked) {
+                bookmarkBtn.classList.add('bookmarked');
+                if (bookmarkIcon) {
+                    bookmarkIcon.classList.remove('far');
+                    bookmarkIcon.classList.add('fas');
+                }
+                if (bookmarkText) {
+                    bookmarkText.textContent = 'Bookmarked';
+                }
+                showToast('Added to bookmarks!', 'success');
+            } else {
+                bookmarkBtn.classList.remove('bookmarked');
+                if (bookmarkIcon) {
+                    bookmarkIcon.classList.remove('fas');
+                    bookmarkIcon.classList.add('far');
+                }
+                if (bookmarkText) {
+                    bookmarkText.textContent = 'Bookmark';
+                }
+                showToast('Removed from bookmarks', 'success');
             }
-            
-            // Show toast notification
-            showToast(
-                isAdded ? 'Added to bookmarks!' : 'Removed from bookmarks',
-                'success'
-            );
-            
-            // Update sidebar count
-            updateBookmarkCount();
         } else {
-            showToast('Failed to update bookmark', 'error');
+            console.error('Toggle failed:', result.message);
+            showToast(result.message, 'error');
         }
     } catch (error) {
         console.error('Error toggling bookmark:', error);
@@ -78,169 +363,76 @@ async function toggleBookmark() {
 }
 
 /**
- * Check if current anime is bookmarked
+ * Check bookmark status on detail page
  */
-async function checkBookmarkStatus() {
-    const animeId = getAnimeId();
-    if (!animeId) return;
+function checkBookmarkStatus() {
+    console.log('Checking bookmark status...');
     
-    try {
-        const response = await fetch(`/api/bookmarks/check/${animeId}`);
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            const bookmarkBtn = document.getElementById('bookmarkBtn');
-            const bookmarkText = document.getElementById('bookmarkText');
-            
-            if (bookmarkBtn) {
-                updateBookmarkButton(bookmarkBtn, result.data.is_bookmarked);
-            }
-            
-            if (bookmarkText) {
-                bookmarkText.textContent = result.data.is_bookmarked 
-                    ? 'Remove from Bookmarks' 
-                    : 'Add to Bookmarks';
-            }
-        }
-    } catch (error) {
-        console.error('Error checking bookmark status:', error);
-    }
-}
-
-/**
- * Update bookmark button appearance
- */
-function updateBookmarkButton(button, isBookmarked) {
-    if (isBookmarked) {
-        button.classList.add('bookmarked');
-    } else {
-        button.classList.remove('bookmarked');
+    const animeData = window.animeData;
+    
+    if (!animeData || !animeData.animeId) {
+        console.log('No anime data found for bookmark check');
+        return;
     }
     
-    // Update icon
-    const icon = button.querySelector('i');
-    if (icon) {
+    console.log('Checking for anime:', animeData.animeId);
+    
+    const bookmarkBtn = document.getElementById('bookmarkBtn');
+    const bookmarkIcon = document.getElementById('bookmarkIcon');
+    const bookmarkText = document.getElementById('bookmarkText');
+    
+    const isBookmarked = window.DayystreamBookmarks.isBookmarked(animeData.animeId);
+    console.log('Current bookmark status:', isBookmarked);
+    
+    if (bookmarkBtn) {
         if (isBookmarked) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
+            bookmarkBtn.classList.add('bookmarked');
+            if (bookmarkIcon) {
+                bookmarkIcon.classList.remove('far');
+                bookmarkIcon.classList.add('fas');
+            }
+            if (bookmarkText) {
+                bookmarkText.textContent = 'Bookmarked';
+            }
         } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-        }
-    }
-}
-
-/**
- * Get anime ID from current page
- * Adjust this based on your page structure
- */
-function getAnimeId() {
-    // Try to get from URL
-    const pathParts = window.location.pathname.split('/');
-    const animeIndex = pathParts.indexOf('anime');
-    
-    if (animeIndex !== -1 && pathParts[animeIndex + 1]) {
-        return pathParts[animeIndex + 1];
-    }
-    
-    // Try to get from data attribute
-    const detailContainer = document.querySelector('[data-anime-id]');
-    if (detailContainer) {
-        return detailContainer.getAttribute('data-anime-id');
-    }
-    
-    return null;
-}
-
-/**
- * Get anime data from current page
- * Disesuaikan dengan struktur detail.html
- */
-function getAnimeData() {
-    return {
-        title: getTextContent('.anime-title') || getTextContent('.detail-title') || document.title,
-        poster: getImageSrc('.anime-poster') || getImageSrc('.detail-poster img') || null,
-        status: getTextContent('.anime-status') || null,
-        rating: getTextContent('.anime-rating') || null,
-        total_episode: getTextContent('.anime-episodes') || null
-    };
-}
-
-/**
- * Helper: Get text content from selector
- */
-function getTextContent(selector) {
-    const element = document.querySelector(selector);
-    return element ? element.textContent.trim() : null;
-}
-
-/**
- * Helper: Get image src from selector
- */
-function getImageSrc(selector) {
-    const element = document.querySelector(selector);
-    return element ? element.src : null;
-}
-
-/**
- * Update bookmark count in sidebar
- */
-async function updateBookmarkCount() {
-    try {
-        const response = await fetch('/api/bookmarks');
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            const count = result.data.count;
-            const badge = document.getElementById('sidebarBookmarkCount');
-            
-            if (badge) {
-                if (count > 0) {
-                    badge.textContent = count > 99 ? '99+' : count;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
+            bookmarkBtn.classList.remove('bookmarked');
+            if (bookmarkIcon) {
+                bookmarkIcon.classList.remove('fas');
+                bookmarkIcon.classList.add('far');
+            }
+            if (bookmarkText) {
+                bookmarkText.textContent = 'Bookmark';
             }
         }
-    } catch (error) {
-        console.error('Error updating bookmark count:', error);
     }
 }
 
 /**
- * Show custom confirmation dialog
+ * Show confirmation dialog
  */
 function showConfirmDialog(title, message, type = 'warning', onConfirm) {
-    // Remove existing dialogs
     const existingDialog = document.querySelector('.confirm-dialog-overlay');
-    if (existingDialog) {
-        existingDialog.remove();
-    }
+    if (existingDialog) existingDialog.remove();
     
-    // Create overlay
     const overlay = document.createElement('div');
     overlay.className = 'confirm-dialog-overlay';
     
-    // Icon based on type
     const icons = {
         warning: 'fa-exclamation-triangle',
         danger: 'fa-times-circle',
-        info: 'fa-info-circle',
-        question: 'fa-question-circle'
+        info: 'fa-info-circle'
     };
     
     const colors = {
         warning: '#f59e0b',
         danger: '#ef4444',
-        info: '#3b82f6',
-        question: '#8b5cf6'
+        info: '#3b82f6'
     };
     
     overlay.innerHTML = `
         <div class="confirm-dialog">
-            <div class="confirm-dialog-icon" style="color: ${colors[type] || colors.warning}">
-                <i class="fas ${icons[type] || icons.warning}"></i>
+            <div class="confirm-dialog-icon" style="color: ${colors[type]}">
+                <i class="fas ${icons[type]}"></i>
             </div>
             <h3 class="confirm-dialog-title">${title}</h3>
             <p class="confirm-dialog-message">${message}</p>
@@ -249,7 +441,7 @@ function showConfirmDialog(title, message, type = 'warning', onConfirm) {
                     <i class="fas fa-times"></i>
                     Cancel
                 </button>
-                <button class="confirm-btn-confirm" id="confirmOk" style="background: ${colors[type] || colors.warning}">
+                <button class="confirm-btn-confirm" id="confirmOk" style="background: ${colors[type]}">
                     <i class="fas fa-check"></i>
                     Confirm
                 </button>
@@ -259,57 +451,31 @@ function showConfirmDialog(title, message, type = 'warning', onConfirm) {
     
     document.body.appendChild(overlay);
     
-    // Add show animation
-    setTimeout(() => {
-        overlay.classList.add('show');
-    }, 10);
-    
-    // Event listeners
-    const cancelBtn = overlay.querySelector('#confirmCancel');
-    const confirmBtn = overlay.querySelector('#confirmOk');
+    setTimeout(() => overlay.classList.add('show'), 10);
     
     const closeDialog = () => {
         overlay.classList.remove('show');
-        setTimeout(() => {
-            overlay.remove();
-        }, 300);
+        setTimeout(() => overlay.remove(), 300);
     };
     
-    cancelBtn.addEventListener('click', closeDialog);
-    
-    confirmBtn.addEventListener('click', () => {
+    overlay.querySelector('#confirmCancel').addEventListener('click', closeDialog);
+    overlay.querySelector('#confirmOk').addEventListener('click', () => {
         closeDialog();
-        if (onConfirm) {
-            onConfirm();
-        }
+        if (onConfirm) onConfirm();
     });
     
-    // Close on overlay click
     overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            closeDialog();
-        }
+        if (e.target === overlay) closeDialog();
     });
-    
-    // Close on ESC key
-    const handleEsc = (e) => {
-        if (e.key === 'Escape') {
-            closeDialog();
-            document.removeEventListener('keydown', handleEsc);
-        }
-    };
-    document.addEventListener('keydown', handleEsc);
 }
 
 /**
  * Show toast notification
  */
 function showToast(message, type = 'info') {
-    // Remove existing toasts
     const existingToasts = document.querySelectorAll('.toast-notification');
     existingToasts.forEach(toast => toast.remove());
     
-    // Create toast element
     const toast = document.createElement('div');
     toast.className = `toast-notification toast-${type}`;
     
@@ -322,7 +488,6 @@ function showToast(message, type = 'info') {
         <span>${message}</span>
     `;
     
-    // Add styles
     const styles = {
         position: 'fixed',
         top: '100px',
@@ -345,99 +510,29 @@ function showToast(message, type = 'info') {
     };
     
     Object.assign(toast.style, styles);
-    
     document.body.appendChild(toast);
     
-    // Auto remove after 3 seconds
     setTimeout(() => {
         toast.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
+        setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
 
 // Add CSS animations
-if (!document.getElementById('bookmark-animations')) {
+if (!document.getElementById('bookmark-styles')) {
     const style = document.createElement('style');
-    style.id = 'bookmark-animations';
+    style.id = 'bookmark-styles';
     style.textContent = `
         @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
         @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
         }
         
-        .bookmark-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .bookmark-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-        
-        .bookmark-btn.bookmarked {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .bookmark-btn.bookmarked:hover {
-            background: var(--primary-hover);
-        }
-        
-        .bookmark-btn i {
-            font-size: 1.1rem;
-        }
-        
-        .bookmark-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .nav-badge {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            min-width: 20px;
-            height: 20px;
-            padding: 0 6px;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-left: auto;
-        }
-        
-        /* Confirmation Dialog Styles */
         .confirm-dialog-overlay {
             position: fixed;
             top: 0;
@@ -460,21 +555,21 @@ if (!document.getElementById('bookmark-animations')) {
         }
         
         .confirm-dialog-overlay.show .confirm-dialog {
-            transform: scale(1) translateY(0);
+            transform: scale(1);
             opacity: 1;
         }
         
         .confirm-dialog {
-            background: var(--bg-card);
+            background: var(--bg-card, #1a1a2e);
             border-radius: 20px;
             padding: 2rem;
             max-width: 450px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            transform: scale(0.9) translateY(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.9);
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.3s ease;
         }
         
         .confirm-dialog-icon {
@@ -491,25 +586,19 @@ if (!document.getElementById('bookmark-animations')) {
         
         .confirm-dialog-icon i {
             font-size: 2.5rem;
-            animation: iconPulse 2s ease infinite;
-        }
-        
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
         }
         
         .confirm-dialog-title {
             font-size: 1.75rem;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--text-primary, #fff);
             text-align: center;
             margin-bottom: 1rem;
         }
         
         .confirm-dialog-message {
             font-size: 1rem;
-            color: var(--text-secondary);
+            color: var(--text-secondary, #aaa);
             text-align: center;
             line-height: 1.6;
             margin-bottom: 2rem;
@@ -537,19 +626,17 @@ if (!document.getElementById('bookmark-animations')) {
         }
         
         .confirm-btn-cancel {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 2px solid var(--border-color);
+            background: var(--bg-secondary, #16213e);
+            color: var(--text-primary, #fff);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         .confirm-btn-cancel:hover {
-            background: var(--hover-bg);
-            border-color: var(--text-secondary);
+            border-color: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
         }
         
         .confirm-btn-confirm {
-            background: #f59e0b;
             color: white;
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
         }
@@ -558,43 +645,35 @@ if (!document.getElementById('bookmark-animations')) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
         }
-        
-        .confirm-btn-confirm:active,
-        .confirm-btn-cancel:active {
-            transform: translateY(0);
-        }
-        
-        @media (max-width: 480px) {
-            .confirm-dialog {
-                padding: 1.5rem;
-            }
-            
-            .confirm-dialog-icon {
-                width: 60px;
-                height: 60px;
-            }
-            
-            .confirm-dialog-icon i {
-                font-size: 2rem;
-            }
-            
-            .confirm-dialog-title {
-                font-size: 1.4rem;
-            }
-            
-            .confirm-dialog-message {
-                font-size: 0.9rem;
-            }
-            
-            .confirm-dialog-actions {
-                grid-template-columns: 1fr;
-            }
-        }
     `;
     document.head.appendChild(style);
 }
 
-// Auto-check bookmark status on page load
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    checkBookmarkStatus();
+    console.log('Bookmark system initialized!');
+    
+    // Update sidebar count on all pages
+    window.DayystreamBookmarks.updateCount();
+    
+    // Check if we're on bookmark page
+    if (window.location.pathname === '/bookmarks') {
+        console.log('On bookmarks page - initializing...');
+        window.DayystreamBookmarks.initBookmarksPage();
+    }
+    
+    // Check if we're on detail page
+    if (window.animeData) {
+        console.log('On detail page - checking bookmark status...');
+        checkBookmarkStatus();
+        
+        // Add click event listener to bookmark button
+        const bookmarkBtn = document.getElementById('bookmarkBtn');
+        if (bookmarkBtn) {
+            console.log('Adding click listener to bookmark button');
+            bookmarkBtn.addEventListener('click', toggleBookmark);
+        } else {
+            console.error('Bookmark button not found!');
+        }
+    }
 });
