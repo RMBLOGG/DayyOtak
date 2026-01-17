@@ -477,9 +477,9 @@
                         {% endif %}
                         
                         <!-- BOOKMARK BUTTON -->
-                        <button class="btn-bookmark" id="bookmarkBtn" onclick="toggleBookmark()">
-                            <i class="far fa-bookmark"></i>
-                            <span id="bookmarkText">Add Bookmark</span>
+                        <button class="btn-bookmark" id="bookmarkBtn">
+                            <i class="far fa-bookmark" id="bookmarkIcon"></i>
+                            <span id="bookmarkText">Bookmark</span>
                         </button>
                         
                         {% if anime.animeId %}
@@ -501,7 +501,7 @@
             </h2>
             <div class="episode-grid">
                 {% for episode in anime.episodeList %}
-                <div class="episode-card" onclick="goToEpisode('{{ episode.episodeId }}')">
+                <div class="episode-card" onclick="window.location.href='/episode/{{ episode.episodeId }}'">
                     <div class="episode-number">
                         <i class="fas fa-play-circle"></i> {{ episode.eps }}
                     </div>
@@ -520,7 +520,7 @@
             </h2>
             <div class="anime-grid">
                 {% for rec in anime.recommendedAnimeList %}
-                <div class="anime-card" onclick="goToAnime('{{ rec.animeId }}')">
+                <div class="anime-card" onclick="window.location.href='/anime/{{ rec.animeId }}'">
                     <img src="{{ rec.poster }}" alt="{{ rec.title }}" loading="lazy">
                     <div class="anime-info">
                         <div class="anime-title">{{ rec.title }}</div>
@@ -538,9 +538,26 @@
         </div>
     {% endif %}
 </div>
+
+<!-- Pass anime data to JavaScript for bookmark system -->
+{% if data and data.status == 'success' %}
+<script>
+// Prepare anime data for bookmark system
+window.animeData = {
+    animeId: {{ anime_id|tojson }},
+    title: {{ data.data.title|tojson }},
+    poster: {{ data.data.poster|tojson }},
+    score: {{ data.data.score|tojson if data.data.score else 'null' }},
+    type: {{ data.data.type|tojson if data.data.type else 'null' }},
+    status: {{ data.data.status|tojson if data.data.status else 'null' }}
+};
+
+console.log('Anime Data loaded:', window.animeData);
+</script>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
-<!-- Load Bookmark Helper -->
+<!-- Load Bookmark System -->
 <script src="{{ url_for('static', filename='js/bookmark.js') }}"></script>
 {% endblock %}
