@@ -58,7 +58,6 @@
         border: none;
     }
     
-    /* Navigation Buttons - 2 Columns Side by Side */
     .navigation-buttons {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -249,6 +248,105 @@
         box-shadow: var(--shadow-lg);
     }
     
+    /* Info Section */
+    .info-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-item {
+        background: rgba(99, 102, 241, 0.05);
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+    }
+    
+    .info-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    .info-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .genre-list-ep {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .genre-tag-ep {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    /* Episode List Section */
+    .episode-list-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .episode-list-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+    
+    .episode-list-item {
+        background: var(--bg-secondary);
+        padding: 1.25rem;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 600;
+        display: block;
+    }
+    
+    .episode-list-item:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        transform: translateY(-5px);
+        color: var(--primary-color);
+    }
+    
+    .episode-list-item.current {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-color: transparent;
+        color: white;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .episode-list-item.current:hover {
+        color: white;
+    }
+    
     @media (max-width: 768px) {
         .video-header {
             padding: 1.25rem 1.5rem;
@@ -275,6 +373,10 @@
         .server-list,
         .download-links {
             grid-template-columns: 1fr;
+        }
+        
+        .episode-list-grid {
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
         }
     }
     
@@ -317,7 +419,6 @@
                 <iframe src="{{ episode.defaultStreamingUrl }}" allowfullscreen scrolling="no"></iframe>
             </div>
             
-            <!-- Navigation Buttons - Side by Side -->
             <div class="navigation-buttons">
                 {% if episode.hasPrevEpisode %}
                 <a href="/episode/{{ episode.prevEpisode.episodeId }}" class="nav-btn">
@@ -404,6 +505,75 @@
         </div>
         {% endif %}
         
+        <!-- Info Section -->
+        {% if episode.info %}
+        <div class="info-section">
+            <h2 class="section-title-ep">
+                <i class="fas fa-info-circle"></i>
+                Informasi
+            </h2>
+            
+            <div class="info-grid">
+                {% if episode.info.credit %}
+                <div class="info-item">
+                    <div class="info-label">Credit</div>
+                    <div class="info-value">{{ episode.info.credit }}</div>
+                </div>
+                {% endif %}
+                
+                {% if episode.info.encoder %}
+                <div class="info-item">
+                    <div class="info-label">Encoder</div>
+                    <div class="info-value">{{ episode.info.encoder }}</div>
+                </div>
+                {% endif %}
+                
+                {% if episode.info.duration %}
+                <div class="info-item">
+                    <div class="info-label">Durasi</div>
+                    <div class="info-value">{{ episode.info.duration }}</div>
+                </div>
+                {% endif %}
+                
+                {% if episode.info.type %}
+                <div class="info-item">
+                    <div class="info-label">Tipe</div>
+                    <div class="info-value">{{ episode.info.type }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if episode.info.genreList %}
+            <div>
+                <div class="info-label" style="margin-bottom: 0.75rem;">Genre</div>
+                <div class="genre-list-ep">
+                    {% for genre in episode.info.genreList %}
+                    <span class="genre-tag-ep">{{ genre.title }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Episode List Section -->
+        {% if episode.info and episode.info.episodeList %}
+        <div class="episode-list-section">
+            <h2 class="section-title-ep">
+                <i class="fas fa-list-ul"></i>
+                Daftar Episode
+            </h2>
+            <div class="episode-list-grid">
+                {% for ep in episode.info.episodeList %}
+                <a href="/episode/{{ ep.episodeId }}" 
+                   class="episode-list-item {% if ep.episodeId == episode_id %}current{% endif %}">
+                    {{ ep.title }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
     {% else %}
         <div class="error">
             <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Episode</h3>
@@ -411,4 +581,8 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JavaScript sudah ada di main.js -->
 {% endblock %}
