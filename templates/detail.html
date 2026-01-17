@@ -195,6 +195,7 @@
         color: var(--primary-color);
     }
     
+    /* Bookmark Button Styles */
     .btn-bookmark {
         padding: 1rem 2rem;
         background: rgba(255, 255, 255, 0.05);
@@ -311,99 +312,6 @@
         color: var(--text-secondary);
     }
     
-    /* Error Card Styles */
-    .error-card {
-        background: var(--bg-card);
-        border-radius: var(--radius-lg);
-        padding: 3rem 2rem;
-        text-align: center;
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        max-width: 600px;
-        margin: 2rem auto;
-    }
-    
-    .error-icon {
-        font-size: 4rem;
-        color: #ef4444;
-        margin-bottom: 1.5rem;
-        animation: errorPulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes errorPulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.7; transform: scale(1.05); }
-    }
-    
-    .error-card h3 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: var(--text-primary);
-    }
-    
-    .error-card > p {
-        font-size: 1rem;
-        color: var(--text-secondary);
-        margin-bottom: 2rem;
-        line-height: 1.6;
-    }
-    
-    .error-suggestion {
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: var(--radius-md);
-        padding: 1.5rem;
-        margin-top: 1.5rem;
-        text-align: left;
-        border: 1px solid var(--border-color);
-    }
-    
-    .error-suggestion p {
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: var(--text-primary);
-    }
-    
-    .error-suggestion ul {
-        list-style: none;
-        padding: 0;
-        margin-bottom: 1.5rem;
-    }
-    
-    .error-suggestion li {
-        padding: 0.5rem 0;
-        padding-left: 1.5rem;
-        position: relative;
-        color: var(--text-secondary);
-    }
-    
-    .error-suggestion li::before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        color: var(--primary-color);
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-    
-    .btn-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.875rem 1.5rem;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-        text-decoration: none;
-        border-radius: var(--radius-md);
-        font-weight: 600;
-        transition: var(--transition);
-        margin-top: 1rem;
-    }
-    
-    .btn-back:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-    }
-    
     @media (max-width: 768px) {
         .detail-content {
             grid-template-columns: 1fr;
@@ -430,18 +338,6 @@
         .btn-bookmark {
             flex: 1;
             width: 100%;
-        }
-        
-        .error-card {
-            padding: 2rem 1.5rem;
-        }
-        
-        .error-icon {
-            font-size: 3rem;
-        }
-        
-        .error-card h3 {
-            font-size: 1.5rem;
         }
     }
 </style>
@@ -580,6 +476,7 @@
                         </a>
                         {% endif %}
                         
+                        <!-- BOOKMARK BUTTON -->
                         <button class="btn-bookmark" id="bookmarkBtn" onclick="toggleBookmark()">
                             <i class="far fa-bookmark"></i>
                             <span id="bookmarkText">Add Bookmark</span>
@@ -635,28 +532,9 @@
         {% endif %}
         
     {% else %}
-        <div class="error-card">
-            <div class="error-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <h3>Error Loading Anime Details</h3>
+        <div class="error">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Anime Details</h3>
             <p>{{ data.message if data else 'Unable to fetch anime data. Please try again later.' }}</p>
-            
-            {% if data and data.message and ('500' in data.message or 'error' in data.message|lower) %}
-            <div class="error-suggestion">
-                <p><strong>Possible reasons:</strong></p>
-                <ul>
-                    <li>The external API is temporarily down</li>
-                    <li>This anime might not exist or has been removed</li>
-                    <li>Network connection issue</li>
-                    <li>The anime ID might be incorrect</li>
-                </ul>
-                <a href="/" class="btn-back">
-                    <i class="fas fa-home"></i>
-                    Back to Home
-                </a>
-            </div>
-            {% endif %}
         </div>
     {% endif %}
 </div>
