@@ -79,6 +79,90 @@
         border: none;
     }
     
+    /* Pre-Play Overlay */
+    .video-preplay-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        cursor: pointer;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    
+    .video-preplay-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+    
+    .preplay-content {
+        text-align: center;
+        color: white;
+        user-select: none;
+    }
+    
+    .preplay-play-button {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 4px solid rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: pulse-play 2s ease-in-out infinite;
+    }
+    
+    .video-preplay-overlay:hover .preplay-play-button {
+        transform: scale(1.1);
+        background: rgba(255, 255, 255, 0.3);
+        border-color: white;
+        animation: none;
+    }
+    
+    @keyframes pulse-play {
+        0%, 100% {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(255, 255, 255, 0.4);
+        }
+        50% {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 0 20px rgba(255, 255, 255, 0);
+        }
+    }
+    
+    .preplay-play-icon {
+        width: 60px;
+        height: 60px;
+        color: white;
+        margin-left: 8px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+    
+    .preplay-text {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
+        margin: 0;
+    }
+    
+    .preplay-hint {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+        font-weight: 600;
+    }
+    
     /* Navigation - Floating Style */
     .navigation-section {
         padding: 1.5rem 2rem;
@@ -447,6 +531,25 @@
             grid-template-columns: 1fr;
             gap: 1.5rem;
         }
+        
+        .preplay-play-button {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .preplay-play-icon {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .preplay-text {
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+        }
+        
+        .preplay-hint {
+            font-size: 0.8rem;
+        }
     }
     
     @media (max-width: 480px) {
@@ -483,6 +586,26 @@
         .section-header i {
             font-size: 1.2rem;
         }
+        
+        .preplay-play-button {
+            width: 90px;
+            height: 90px;
+            border-width: 3px;
+        }
+        
+        .preplay-play-icon {
+            width: 45px;
+            height: 45px;
+        }
+        
+        .preplay-text {
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+        }
+        
+        .preplay-hint {
+            font-size: 0.75rem;
+        }
     }
 </style>
 {% endblock %}
@@ -508,7 +631,20 @@
             </div>
             
             <div class="video-player" id="videoPlayer">
-                <iframe src="{{ episode.defaultStreamingUrl }}" allowfullscreen scrolling="no"></iframe>
+                <!-- Pre-Play Overlay -->
+                <div class="video-preplay-overlay" id="preplayOverlay">
+                    <div class="preplay-content">
+                        <div class="preplay-play-button">
+                            <svg class="preplay-play-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <p class="preplay-text" id="preplayText">PLAY VIDEO</p>
+                        <p class="preplay-hint">Click to start watching</p>
+                    </div>
+                </div>
+                
+                <iframe id="videoIframe" src="{{ episode.defaultStreamingUrl }}" allowfullscreen scrolling="no" style="display: none;"></iframe>
             </div>
             
             <div class="navigation-section">
@@ -687,5 +823,165 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- JavaScript for server switching already in main.js -->
+<script>
+// Pre-Play Click Ads System - Safe Implementation
+(function() {
+    'use strict';
+    
+    // Configuration
+    const AD_URL = 'https://www.effectivegatecpm.com/tbrpycbu?key=b9c9092242d62c2cc6a0445da034b8be';
+    const SESSION_KEY = 'episode_preplay_clicked';
+    
+    // State management
+    let hasClickedOnce = false;
+    
+    // Check if ad was already shown in this session
+    function isAdShownInSession() {
+        try {
+            return sessionStorage.getItem(SESSION_KEY) === 'true';
+        } catch (e) {
+            return false;
+        }
+    }
+    
+    // Mark ad as shown in session
+    function markAdShown() {
+        try {
+            sessionStorage.setItem(SESSION_KEY, 'true');
+        } catch (e) {
+            console.log('SessionStorage not available');
+        }
+    }
+    
+    // Initialize pre-play overlay
+    function initPrePlayOverlay() {
+        const overlay = document.getElementById('preplayOverlay');
+        const videoIframe = document.getElementById('videoIframe');
+        const preplayText = document.getElementById('preplayText');
+        
+        if (!overlay || !videoIframe) {
+            return;
+        }
+        
+        // Check if ad was already shown
+        if (isAdShownInSession()) {
+            // Skip ad, show video directly
+            overlay.classList.add('hidden');
+            videoIframe.style.display = 'block';
+            return;
+        }
+        
+        // Handle overlay click
+        overlay.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (!hasClickedOnce) {
+                // First click: Open ad in new tab
+                hasClickedOnce = true;
+                
+                // Open ad
+                try {
+                    window.open(AD_URL, '_blank');
+                } catch (err) {
+                    console.log('Ad blocked');
+                }
+                
+                // Update UI for second click
+                if (preplayText) {
+                    preplayText.textContent = 'CLICK AGAIN TO PLAY';
+                }
+                
+                // Mark ad as shown in this session
+                markAdShown();
+                
+            } else {
+                // Second click: Hide overlay and show video
+                overlay.classList.add('hidden');
+                videoIframe.style.display = 'block';
+            }
+        });
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPrePlayOverlay);
+    } else {
+        initPrePlayOverlay();
+    }
+    
+    // Reset overlay when server changes (if changeServer function exists)
+    window.resetPrePlayOverlay = function() {
+        const overlay = document.getElementById('preplayOverlay');
+        const videoIframe = document.getElementById('videoIframe');
+        const preplayText = document.getElementById('preplayText');
+        
+        if (overlay && videoIframe && preplayText) {
+            // Reset state
+            hasClickedOnce = false;
+            
+            // Show overlay again
+            overlay.classList.remove('hidden');
+            videoIframe.style.display = 'none';
+            
+            // Reset text
+            preplayText.textContent = 'PLAY VIDEO';
+        }
+    };
+    
+})();
+
+// Existing server switching functionality (preserve original behavior)
+window.showServers = function(qualityTitle) {
+    // Hide all server grids
+    const allServerGrids = document.querySelectorAll('[id^="servers-"]');
+    allServerGrids.forEach(grid => {
+        grid.style.display = 'none';
+    });
+    
+    // Remove active class from all quality pills
+    const allQualityPills = document.querySelectorAll('.quality-pill');
+    allQualityPills.forEach(pill => {
+        pill.classList.remove('active');
+    });
+    
+    // Show selected server grid
+    const selectedGrid = document.getElementById('servers-' + qualityTitle);
+    if (selectedGrid) {
+        selectedGrid.style.display = 'grid';
+    }
+    
+    // Add active class to clicked quality pill
+    event.target.classList.add('active');
+};
+
+window.changeServer = function(serverId, serverTitle) {
+    // Fetch new server URL
+    fetch('/api/server/' + serverId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                const videoIframe = document.getElementById('videoIframe');
+                if (videoIframe) {
+                    videoIframe.src = data.url;
+                }
+                
+                // Reset pre-play overlay for new server
+                if (typeof window.resetPrePlayOverlay === 'function') {
+                    window.resetPrePlayOverlay();
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error changing server:', error);
+        });
+};
+
+// Initialize first quality on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const firstQualityPill = document.querySelector('.quality-pill');
+    if (firstQualityPill) {
+        firstQualityPill.click();
+    }
+});
+</script>
 {% endblock %}
