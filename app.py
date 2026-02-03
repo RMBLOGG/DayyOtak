@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
 import requests
 from functools import lru_cache
 from datetime import datetime, timedelta
@@ -202,6 +202,10 @@ def genre_detail(genre_id):
 def api_genre_detail(genre_id):
     data = fetch_api(f'/anime/genre/{genre_id}', 'genre')
     return jsonify(data)
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return send_from_directory("static", "sitemap.xml")
 
 # Vercel needs this
 if __name__ == '__main__':
