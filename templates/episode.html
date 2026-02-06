@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ data.data.title if data and data.status == 'success' else 'Episode' }} - AnimeStream{% endblock %}
+{% block title %}{{ data.data.title if data and data.status == 'success' else 'Episode' }} - DAYYdesu{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -12,7 +12,7 @@
     /* Video Section - Full Width Hero */
     .video-hero {
         position: relative;
-        margin: -2rem -2rem 0;
+        margin: -1.75rem -1.75rem 2.5rem;
         background: #000;
     }
     
@@ -26,7 +26,7 @@
     
     .video-title {
         font-size: 1.5rem;
-        font-weight: 800;
+        font-weight: 700;
         margin-bottom: 0.5rem;
         color: var(--text-primary);
         display: flex;
@@ -53,9 +53,9 @@
         align-items: center;
         gap: 0.35rem;
         padding: 0.3rem 0.75rem;
-        background: rgba(99, 102, 241, 0.1);
+        background: rgba(59, 130, 246, 0.1);
         border-radius: 50px;
-        border: 1px solid rgba(99, 102, 241, 0.2);
+        border: 1px solid rgba(59, 130, 246, 0.2);
     }
     
     .video-time i {
@@ -86,7 +86,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -108,15 +108,15 @@
     }
     
     .preplay-play-button {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
         background: rgba(255, 255, 255, 0.2);
-        border: 4px solid rgba(255, 255, 255, 0.9);
+        border: 3px solid rgba(255, 255, 255, 0.9);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.5rem;
+        margin: 0 auto 1.25rem;
         transition: all 0.3s ease;
         backdrop-filter: blur(10px);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -140,33 +140,34 @@
     }
     
     .preplay-play-icon {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         color: white;
-        margin-left: 8px;
+        margin-left: 6px;
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     }
     
     .preplay-text {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 800;
-        letter-spacing: 3px;
+        letter-spacing: 2px;
         text-transform: uppercase;
         text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
         margin: 0;
     }
     
     .preplay-hint {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         opacity: 0.9;
         margin-top: 0.5rem;
-        font-weight: 600;
+        font-weight: 500;
     }
     
     /* Navigation - Floating Style */
     .navigation-section {
         padding: 1.5rem 2rem;
         background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
     }
     
     .navigation-buttons {
@@ -178,11 +179,11 @@
     }
     
     .nav-btn {
-        padding: 0.875rem 1.25rem;
+        padding: 0.875rem 1.5rem;
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
         border: none;
-        border-radius: 50px;
+        border-radius: 10px;
         font-weight: 700;
         font-size: 0.9rem;
         cursor: pointer;
@@ -193,16 +194,16 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .nav-btn:hover:not(:disabled) {
         transform: translateY(-3px);
-        box-shadow: 0 10px 28px rgba(99, 102, 241, 0.4);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
     }
     
     .nav-btn:disabled {
-        opacity: 0.3;
+        opacity: 0.4;
         cursor: not-allowed;
         background: rgba(100, 100, 120, 0.3);
         box-shadow: none;
@@ -214,34 +215,52 @@
     
     /* Content Area */
     .content-area {
-        padding: 3rem 2rem;
+        padding: 0;
     }
     
-    /* Section Headers */
+    /* Section Headers - Konsisten dengan home.html */
     .section-header {
-        font-size: 2rem;
-        font-weight: 900;
-        margin-bottom: 2rem;
-        color: var(--text-primary);
         display: flex;
         align-items: center;
-        gap: 1rem;
+        justify-content: space-between;
+        margin-bottom: 1.875rem;
     }
     
-    .section-header i {
-        color: var(--primary-color);
-        font-size: 1.75rem;
+    .section-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0;
     }
     
-    /* Streaming Servers - Pill Style */
+    .section-accent {
+        width: 5px;
+        height: 2.375rem;
+        background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+        border-radius: 3px;
+        margin-right: 1.125rem;
+    }
+    
+    .section-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    /* Anime Section */
+    .anime-section {
+        margin-bottom: 3rem;
+    }
+    
+    /* Streaming Servers */
     .streaming-section {
-        margin-bottom: 4rem;
+        margin-bottom: 3rem;
     }
     
     .quality-selector {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 2rem;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
         flex-wrap: wrap;
     }
     
@@ -252,7 +271,7 @@
         border-radius: 50px;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-weight: 700;
+        font-weight: 600;
         font-size: 0.85rem;
         color: var(--text-secondary);
     }
@@ -260,11 +279,12 @@
     .quality-pill.active {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
-        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+        border-color: transparent;
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
     }
     
     .quality-pill:hover:not(.active) {
-        background: rgba(99, 102, 241, 0.1);
+        background: rgba(59, 130, 246, 0.08);
         border-color: var(--primary-color);
         color: var(--primary-color);
     }
@@ -272,148 +292,158 @@
     .server-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 0.625rem;
+        gap: 0.75rem;
     }
     
     .server-item {
-        padding: 0.625rem 0.75rem;
-        background: var(--bg-secondary);
+        padding: 0.75rem;
+        background: var(--bg-card);
         border: 1px solid var(--border-color);
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition: all 0.3s ease;
         text-align: center;
         font-weight: 600;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.375rem;
+        gap: 0.5rem;
         color: var(--text-primary);
-        min-height: 36px;
     }
     
     .server-item:hover {
-        background: rgba(99, 102, 241, 0.1);
+        background: rgba(59, 130, 246, 0.1);
         border-color: var(--primary-color);
         color: var(--primary-color);
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
     
     .server-item i {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
     }
     
-    /* Info Grid - Open Layout */
+    /* Info Grid */
     .info-section {
-        margin-bottom: 4rem;
+        margin-bottom: 3rem;
     }
     
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
         margin-bottom: 2rem;
     }
     
     .info-block {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+        padding: 1.25rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .info-block:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.3);
     }
     
     .info-label {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1.5px;
         color: var(--text-secondary);
         font-weight: 700;
+        margin-bottom: 0.5rem;
     }
     
     .info-value {
-        font-size: 1.2rem;
-        font-weight: 800;
+        font-size: 1.1rem;
+        font-weight: 700;
         color: var(--text-primary);
     }
     
     .genre-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-top: 1rem;
+        gap: 0.625rem;
     }
     
     .genre-badge {
-        padding: 0.4rem 0.9rem;
-        background: rgba(99, 102, 241, 0.15);
-        border: 2px solid rgba(99, 102, 241, 0.3);
+        padding: 0.5rem 1rem;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.25);
         border-radius: 50px;
         font-size: 0.8rem;
-        font-weight: 700;
+        font-weight: 600;
         color: var(--primary-color);
         transition: all 0.3s ease;
     }
     
     .genre-badge:hover {
-        background: rgba(99, 102, 241, 0.25);
+        background: rgba(59, 130, 246, 0.2);
         border-color: var(--primary-color);
         transform: translateY(-2px);
     }
     
-    /* Episode List - Grid Without Borders */
+    /* Episode List - Grid Style seperti anime-grid */
     .episode-list-section {
-        margin-bottom: 4rem;
+        margin-bottom: 3rem;
     }
     
     .episode-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 0.875rem;
     }
     
     .episode-card {
-        padding: 0.875rem 1rem;
-        background: var(--bg-secondary);
-        border-radius: 12px;
+        padding: 0.875rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
         color: var(--text-primary);
-        font-weight: 700;
+        font-weight: 600;
         font-size: 0.85rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid var(--border-color);
     }
     
     .episode-card:hover {
-        background: rgba(99, 102, 241, 0.15);
+        background: rgba(59, 130, 246, 0.1);
         border-color: var(--primary-color);
         color: var(--primary-color);
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
     
     .episode-card.current {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
-        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .episode-card.current:hover {
         color: white;
-        transform: translateY(-5px) scale(1.05);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
     }
     
-    /* Download Section - Minimalist */
+    /* Download Section */
     .download-section {
-        margin-bottom: 4rem;
+        margin-bottom: 3rem;
     }
     
     .download-group {
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
     }
     
     .download-group:last-child {
@@ -421,31 +451,36 @@
     }
     
     .download-quality-header {
-        font-size: 1.3rem;
-        font-weight: 800;
-        margin-bottom: 1.25rem;
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        color: var(--text-primary);
+    }
+    
+    .download-quality-header i {
+        color: var(--primary-color);
     }
     
     .quality-badge {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
-        padding: 0.35rem 1rem;
+        padding: 0.375rem 0.875rem;
         border-radius: 50px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 700;
     }
     
     .download-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.875rem;
     }
     
     .download-btn {
-        padding: 0.75rem 1rem;
+        padding: 0.875rem 1.25rem;
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         border-radius: 10px;
         color: white;
@@ -457,22 +492,22 @@
         font-weight: 600;
         font-size: 0.85rem;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .download-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
     }
     
     .download-btn i {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
     }
     
     /* Responsive */
     @media (max-width: 1024px) {
         .video-hero {
-            margin: -1rem -1rem 0;
+            margin: -1rem -1rem 2rem;
         }
         
         .video-header {
@@ -483,30 +518,35 @@
             font-size: 1.3rem;
         }
         
-        .section-header {
-            font-size: 1.75rem;
+        .section-title {
+            font-size: 1.625rem;
         }
         
-        .section-header i {
-            font-size: 1.5rem;
+        .section-accent {
+            height: 2rem;
         }
     }
     
     @media (max-width: 768px) {
         .video-hero {
-            margin: -1rem -1rem 0;
+            margin: -1rem -1rem 2rem;
         }
         
-        .content-area {
-            padding: 2rem 1rem;
+        .video-header {
+            padding: 1rem;
         }
         
-        .section-header {
-            font-size: 1.5rem;
+        .video-title {
+            font-size: 1.125rem;
+            gap: 0.5rem;
         }
         
-        .section-header i {
-            font-size: 1.3rem;
+        .video-title i {
+            font-size: 1.125rem;
+        }
+        
+        .navigation-section {
+            padding: 1rem;
         }
         
         .nav-btn {
@@ -518,33 +558,42 @@
             font-size: 0.95rem;
         }
         
+        .section-title {
+            font-size: 1.5rem;
+        }
+        
+        .section-accent {
+            height: 1.875rem;
+            margin-right: 0.875rem;
+        }
+        
         .server-grid,
         .download-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         }
         
         .episode-grid {
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         }
         
         .info-grid {
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 1rem;
         }
         
         .preplay-play-button {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
         }
         
         .preplay-play-icon {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
         }
         
         .preplay-text {
-            font-size: 1.3rem;
-            letter-spacing: 2px;
+            font-size: 1.125rem;
+            letter-spacing: 1.5px;
         }
         
         .preplay-hint {
@@ -553,21 +602,16 @@
     }
     
     @media (max-width: 480px) {
-        .video-header {
-            padding: 1rem;
-        }
-        
         .video-title {
-            font-size: 1.1rem;
-            gap: 0.5rem;
+            font-size: 1rem;
         }
         
         .video-title i {
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
         
         .navigation-section {
-            padding: 1rem;
+            padding: 0.875rem;
         }
         
         .nav-btn {
@@ -579,28 +623,43 @@
             font-size: 0.9rem;
         }
         
-        .section-header {
-            font-size: 1.3rem;
+        .section-title {
+            font-size: 1.25rem;
         }
         
-        .section-header i {
-            font-size: 1.2rem;
+        .section-accent {
+            height: 1.625rem;
+            width: 4px;
+        }
+        
+        .quality-selector {
+            gap: 0.5rem;
+        }
+        
+        .quality-pill {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .episode-grid {
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 0.625rem;
         }
         
         .preplay-play-button {
-            width: 90px;
-            height: 90px;
-            border-width: 3px;
+            width: 80px;
+            height: 80px;
+            border-width: 2px;
         }
         
         .preplay-play-icon {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
         }
         
         .preplay-text {
-            font-size: 1.1rem;
-            letter-spacing: 1.5px;
+            font-size: 1rem;
+            letter-spacing: 1px;
         }
         
         .preplay-hint {
@@ -680,11 +739,13 @@
         <div class="content-area">
             <!-- Streaming Servers -->
             {% if episode.server and episode.server.qualities %}
-            <div class="streaming-section">
-                <h2 class="section-header">
-                    <i class="fas fa-server"></i>
-                    Streaming Servers
-                </h2>
+            <div class="anime-section streaming-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <div class="section-accent"></div>
+                        <h2 class="section-title">Streaming Servers</h2>
+                    </div>
+                </div>
                 
                 <div class="quality-selector">
                     {% for quality in episode.server.qualities %}
@@ -713,11 +774,13 @@
             
             <!-- Info Section -->
             {% if episode.info %}
-            <div class="info-section">
-                <h2 class="section-header">
-                    <i class="fas fa-info-circle"></i>
-                    Information
-                </h2>
+            <div class="anime-section info-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <div class="section-accent"></div>
+                        <h2 class="section-title">Information</h2>
+                    </div>
+                </div>
                 
                 <div class="info-grid">
                     {% if episode.info.credit %}
@@ -764,11 +827,13 @@
             
             <!-- Episode List -->
             {% if episode.info and episode.info.episodeList %}
-            <div class="episode-list-section">
-                <h2 class="section-header">
-                    <i class="fas fa-list-ul"></i>
-                    All Episodes
-                </h2>
+            <div class="anime-section episode-list-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <div class="section-accent"></div>
+                        <h2 class="section-title">All Episodes</h2>
+                    </div>
+                </div>
                 <div class="episode-grid">
                     {% for ep in episode.info.episodeList %}
                     <a href="/episode/{{ ep.episodeId }}" 
@@ -782,11 +847,13 @@
             
             <!-- Download Section -->
             {% if episode.downloadUrl and episode.downloadUrl.qualities %}
-            <div class="download-section">
-                <h2 class="section-header">
-                    <i class="fas fa-download"></i>
-                    Download Episode
-                </h2>
+            <div class="anime-section download-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <div class="section-accent"></div>
+                        <h2 class="section-title">Download Episode</h2>
+                    </div>
+                </div>
                 
                 {% for quality in episode.downloadUrl.qualities %}
                 <div class="download-group">

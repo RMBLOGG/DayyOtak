@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Schedule - AnimeStream{% endblock %}
+{% block title %}Schedule - DAYYdesu{% endblock %}
 
 {% block extra_css %}
 <style>
     .schedule-container {
-        max-width: 1400px;
+        max-width: 1600px;
         margin: 0 auto;
     }
     
@@ -14,17 +14,45 @@
         margin-bottom: 3rem;
     }
     
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0;
+    }
+    
+    .section-accent {
+        width: 5px;
+        height: 2.375rem;
+        background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+        border-radius: 3px;
+        margin-right: 1.125rem;
+    }
+    
+    .section-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
     .schedule-subtitle {
         color: var(--text-secondary);
-        font-size: 1.1rem;
+        font-size: 1rem;
         margin-top: 0.5rem;
     }
     
     .day-section {
         background: var(--bg-card);
-        border-radius: var(--radius-lg);
+        border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
         border: 1px solid var(--border-color);
     }
     
@@ -33,51 +61,74 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid var(--border-color);
     }
     
     .day-title {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        font-size: 1.8rem;
+        gap: 0.875rem;
+        font-size: 1.625rem;
         font-weight: 700;
         color: var(--text-primary);
     }
     
     .day-icon {
-        font-size: 2rem;
+        font-size: 1.875rem;
     }
     
     .day-count {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
-        padding: 0.5rem 1.25rem;
-        border-radius: 20px;
-        font-size: 0.95rem;
-        font-weight: 600;
+        padding: 0.5rem 1.125rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .schedule-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+        gap: 1.375rem;
     }
     
     .schedule-card {
         background: var(--bg-secondary);
-        border-radius: var(--radius-md);
+        border-radius: 12px;
         overflow: hidden;
-        transition: var(--transition);
+        transition: all 0.3s ease;
         cursor: pointer;
         border: 1px solid var(--border-color);
+        position: relative;
+    }
+    
+    .schedule-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(10, 14, 39, 0.95) 0%, transparent 60%);
+        opacity: 0;
+        transition: var(--transition);
+        z-index: 1;
+        pointer-events: none;
     }
     
     .schedule-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-        border-color: var(--primary-color);
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 0 16px 40px rgba(59, 130, 246, 0.3);
+        border-color: rgba(59, 130, 246, 0.5);
+    }
+    
+    .schedule-card:hover::after {
+        opacity: 1;
     }
     
     .schedule-card img {
@@ -88,11 +139,13 @@
     }
     
     .schedule-card:hover img {
-        transform: scale(1.05);
+        transform: scale(1.1);
     }
     
     .schedule-info {
         padding: 1rem;
+        position: relative;
+        z-index: 2;
     }
     
     .schedule-title {
@@ -104,19 +157,78 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
         line-height: 1.4;
+        min-height: 2.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .section-accent {
+            height: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.625rem;
+        }
+        
+        .day-title {
+            font-size: 1.5rem;
+        }
     }
     
     @media (max-width: 768px) {
         .schedule-grid {
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+            gap: 1.125rem;
+        }
+        
+        .day-section {
+            padding: 1.5rem;
         }
         
         .day-title {
-            font-size: 1.4rem;
+            font-size: 1.375rem;
         }
         
         .schedule-card img {
-            height: 200px;
+            height: 210px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+        }
+        
+        .section-accent {
+            height: 1.875rem;
+            margin-right: 0.875rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .schedule-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.875rem;
+        }
+        
+        .day-section {
+            padding: 1.25rem;
+        }
+        
+        .day-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+        }
+        
+        .section-accent {
+            height: 1.625rem;
+            width: 4px;
+        }
+        
+        .day-title {
+            font-size: 1.25rem;
         }
     }
 </style>
@@ -125,10 +237,12 @@
 {% block content %}
 <div class="schedule-container">
     <div class="schedule-intro">
-        <h1 class="section-title" style="justify-content: center;">
-            <i class="fas fa-calendar-alt"></i>
-            Weekly Anime Schedule
-        </h1>
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-accent"></div>
+                <h1 class="section-title">Weekly Anime Schedule</h1>
+            </div>
+        </div>
         <p class="schedule-subtitle">Check out what's airing this week</p>
     </div>
     

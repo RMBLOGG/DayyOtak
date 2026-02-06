@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Genres - AnimeStream{% endblock %}
+{% block title %}Genres - DAYYdesu{% endblock %}
 
 {% block extra_css %}
 <style>
     .genres-container {
-        max-width: 1400px;
+        max-width: 1600px;
         margin: 0 auto;
     }
     
@@ -14,25 +14,53 @@
         margin-bottom: 3rem;
     }
     
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0;
+    }
+    
+    .section-accent {
+        width: 5px;
+        height: 2.375rem;
+        background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+        border-radius: 3px;
+        margin-right: 1.125rem;
+    }
+    
+    .section-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
     .genres-subtitle {
         color: var(--text-secondary);
-        font-size: 1.1rem;
+        font-size: 1rem;
         margin-top: 0.5rem;
     }
     
     .genres-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.25rem;
     }
     
     .genre-card {
         background: var(--bg-card);
-        border-radius: var(--radius-md);
-        padding: 2.5rem 1.5rem;
+        border-radius: 12px;
+        padding: 2.25rem 1.5rem;
         text-align: center;
         cursor: pointer;
-        transition: var(--transition);
+        transition: all 0.3s ease;
         border: 1px solid var(--border-color);
         position: relative;
         overflow: hidden;
@@ -54,7 +82,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(236, 72, 153, 0.05));
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
         opacity: 0;
         transition: var(--transition);
     }
@@ -68,28 +96,38 @@
     }
     
     .genre-card:hover {
-        transform: translateY(-10px);
-        box-shadow: var(--shadow-xl);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 32px rgba(59, 130, 246, 0.25);
         border-color: var(--primary-color);
     }
     
     .genre-icon {
-        font-size: 3.5rem;
-        margin-bottom: 1.25rem;
+        font-size: 3rem;
+        margin-bottom: 1rem;
         display: block;
         transition: var(--transition);
     }
     
     .genre-card:hover .genre-icon {
-        transform: scale(1.2) rotate(5deg);
+        transform: scale(1.15) rotate(5deg);
     }
     
     .genre-name {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: var(--text-primary);
         position: relative;
         z-index: 1;
+    }
+    
+    @media (max-width: 1024px) {
+        .section-accent {
+            height: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.625rem;
+        }
     }
     
     @media (max-width: 768px) {
@@ -107,7 +145,31 @@
         }
         
         .genre-name {
-            font-size: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+        }
+        
+        .section-accent {
+            height: 1.875rem;
+            margin-right: 0.875rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .genres-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+        }
+        
+        .section-accent {
+            height: 1.625rem;
+            width: 4px;
         }
     }
 </style>
@@ -116,10 +178,12 @@
 {% block content %}
 <div class="genres-container">
     <div class="genres-header">
-        <h1 class="section-title" style="justify-content: center;">
-            <i class="fas fa-theater-masks"></i>
-            All Anime Genres
-        </h1>
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-accent"></div>
+                <h1 class="section-title">All Anime Genres</h1>
+            </div>
+        </div>
         <p class="genres-subtitle">Explore anime by your favorite genres</p>
     </div>
     
