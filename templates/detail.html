@@ -597,6 +597,9 @@
         }
     }
 </style>
+
+<!-- Share System Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/share-system.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -736,6 +739,8 @@
                             Download
                         </a>
                         {% endif %}
+                        
+                        <!-- Share button will be added dynamically by share-system.js -->
                     </div>
                 </div>
             </div>
@@ -820,10 +825,10 @@
     {% endif %}
 </div>
 
-<!-- Pass anime data to JavaScript for bookmark system -->
+<!-- Pass anime data to JavaScript for bookmark and share systems -->
 {% if data and data.status == 'success' %}
 <script>
-// Prepare anime data for bookmark system
+// Prepare anime data for bookmark and share systems
 window.animeData = {
     animeId: {{ anime_id|tojson }},
     title: {{ data.data.title|tojson }},
@@ -841,4 +846,6 @@ console.log('Anime Data loaded:', window.animeData);
 {% block extra_js %}
 <!-- Load Bookmark System -->
 <script src="{{ url_for('static', filename='js/bookmark.js') }}"></script>
+<!-- Load Share System -->
+<script src="{{ url_for('static', filename='js/share-system.js') }}"></script>
 {% endblock %}
