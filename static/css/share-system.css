@@ -1,0 +1,634 @@
+/* ============================================
+   SHARE SYSTEM STYLES
+   Modern, Beautiful Share Modal & Components
+   ============================================ */
+
+/* Share Button */
+.btn-share {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-share::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-share:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-share:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+}
+
+.btn-share i,
+.btn-share span {
+    position: relative;
+    z-index: 1;
+}
+
+/* Share Modal */
+.share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.share-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.share-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+}
+
+.share-modal-content {
+    position: relative;
+    background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+    border-radius: 24px;
+    padding: 2.5rem;
+    max-width: 550px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1;
+}
+
+/* Custom Scrollbar */
+.share-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.share-modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.share-modal-content::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 10px;
+}
+
+.share-modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.7);
+}
+
+/* Close Button */
+.share-modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.share-modal-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+/* Modal Header */
+.share-modal-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.share-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    animation: pulse 2s infinite;
+}
+
+.share-modal-header h3 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.share-modal-header p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
+}
+
+/* Share Options Grid */
+.share-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.share-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.25rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.share-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.share-option:hover::before {
+    opacity: 1;
+}
+
+.share-option:hover {
+    transform: translateY(-8px);
+    border-color: rgba(59, 130, 246, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.share-option-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.share-option span {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+}
+
+/* Share Link Box */
+.share-link-box {
+    display: flex;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.share-link-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    font-family: 'Courier New', monospace;
+}
+
+.share-link-box input::selection {
+    background: rgba(59, 130, 246, 0.3);
+}
+
+#copyLinkBtn {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+#copyLinkBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+#copyLinkBtn:active {
+    transform: scale(0.98);
+}
+
+/* Share Preview Box */
+.share-preview-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.share-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.share-preview-header h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.share-preview-header h4 i {
+    color: #3b82f6;
+    font-size: 0.9rem;
+}
+
+.btn-edit-text {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #60a5fa;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.btn-edit-text:hover {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.share-preview-content {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    min-height: 120px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.share-preview-content strong {
+    color: white;
+    font-weight: 700;
+}
+
+/* Share Text Editor */
+.share-text-editor {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.875rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-family: system-ui, -apple-system, sans-serif;
+    resize: vertical;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.share-text-editor:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.share-text-editor::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Share Edit Buttons */
+.share-edit-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.share-edit-buttons button {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-save-text {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-save-text:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-cancel-text {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-cancel-text:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-reset-text {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-reset-text:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #ef4444;
+}
+
+/* Share Card Container */
+.share-card-container {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.1);
+    animation: slideDown 0.4s ease;
+}
+
+.share-card-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.share-card-header h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.share-card-header p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#shareCanvas {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1.5rem;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-download-card {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #ec4899, #db2777);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
+}
+
+.btn-download-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(236, 72, 153, 0.5);
+}
+
+.btn-download-card:active {
+    transform: translateY(-1px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.6);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .share-modal-content {
+        padding: 2rem 1.5rem;
+        max-width: 95%;
+    }
+
+    .share-options {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .share-option {
+        padding: 1rem 0.5rem;
+    }
+
+    .share-option-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.25rem;
+    }
+
+    .share-option span {
+        font-size: 0.8rem;
+    }
+
+    .share-modal-header h3 {
+        font-size: 1.5rem;
+    }
+
+    .share-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        font-size: 1.75rem;
+    }
+
+    .share-preview-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .btn-edit-text {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .share-modal-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .share-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .share-modal-header h3 {
+        font-size: 1.25rem;
+    }
+
+    .share-link-box {
+        flex-direction: column;
+    }
+
+    .share-link-box input {
+        font-size: 0.8rem;
+    }
+
+    #copyLinkBtn {
+        width: 100%;
+    }
+
+    .share-edit-buttons {
+        flex-direction: column;
+    }
+
+    .share-edit-buttons button {
+        width: 100%;
+    }
+}
+
+/* Print Styles - Hide share modal when printing */
+@media print {
+    .share-modal {
+        display: none !important;
+    }
+}
