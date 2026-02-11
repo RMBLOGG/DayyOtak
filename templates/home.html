@@ -17,7 +17,7 @@
         height: 280px;
         overflow: hidden;
         margin-bottom: 1.5rem;
-        background: #1a1f3a;
+        background: var(--bg-card);
     }
     
     .slider-wrapper {
@@ -54,8 +54,15 @@
         right: 0;
         bottom: 0;
         background: linear-gradient(to top, 
-            rgba(15, 20, 41, 0.95) 0%, 
-            rgba(15, 20, 41, 0.6) 50%,
+            rgba(15, 20, 41, 0.85) 0%, 
+            rgba(15, 20, 41, 0.4) 50%,
+            transparent 100%);
+    }
+    
+    body.light-theme .slide-overlay {
+        background: linear-gradient(to top, 
+            rgba(241, 245, 249, 0.75) 0%, 
+            rgba(241, 245, 249, 0.25) 50%,
             transparent 100%);
     }
     
@@ -89,20 +96,25 @@
     .slide-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: white;
+        color: var(--text-primary);
         margin-bottom: 0.75rem;
         line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    
+    body.light-theme .slide-title {
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
     
     .watch-now-btn {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: #3b82f6;
+        background: var(--primary-color);
         color: white;
         padding: 0.625rem 1.25rem;
         border-radius: 8px;
@@ -112,11 +124,13 @@
         transition: all 0.3s ease;
         border: none;
         cursor: pointer;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .watch-now-btn:hover {
-        background: #2563eb;
+        background: var(--primary-dark);
         transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
     }
     
     /* Slider Indicators */
@@ -138,10 +152,18 @@
         transition: all 0.3s ease;
     }
     
+    body.light-theme .slider-dot {
+        background: rgba(59, 130, 246, 0.5);
+    }
+    
     .slider-dot.active {
         width: 20px;
         border-radius: 3px;
         background: white;
+    }
+    
+    body.light-theme .slider-dot.active {
+        background: var(--primary-color);
     }
     
     /* Section Header */
@@ -159,7 +181,7 @@
     .section-accent {
         width: 3px;
         height: 1.5rem;
-        background: #3b82f6;
+        background: var(--primary-color);
         border-radius: 2px;
         margin-right: 0.75rem;
     }
@@ -167,7 +189,7 @@
     .section-title {
         font-size: 1.125rem;
         font-weight: 700;
-        color: #f8fafc;
+        color: var(--text-primary);
         margin: 0;
     }
     
@@ -185,18 +207,22 @@
     }
     
     .anime-card {
-        background: #1e2642;
+        background: var(--bg-card);
         border-radius: 12px;
         overflow: hidden;
         transition: all 0.3s ease;
         cursor: pointer;
-        border: 1px solid rgba(59, 130, 246, 0.1);
+        border: 1px solid var(--border-color);
     }
     
     .anime-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
-        border-color: rgba(59, 130, 246, 0.3);
+        border-color: var(--primary-color);
+    }
+    
+    body.light-theme .anime-card:hover {
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
     }
     
     .anime-poster {
@@ -246,6 +272,10 @@
         gap: 0.25rem;
     }
     
+    body.light-theme .episode-badge {
+        background: rgba(0, 0, 0, 0.75);
+    }
+    
     .anime-info {
         padding: 0.75rem;
     }
@@ -253,7 +283,7 @@
     .anime-title {
         font-size: 0.8rem;
         font-weight: 600;
-        color: #f8fafc;
+        color: var(--text-primary);
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
