@@ -1,9 +1,9 @@
 // Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     loadSavedTheme();
-    initSidebar();
+    initBottomNav();
+    initMenuModal();
     setActiveNavItem();
-    initThemeToggle();
     initNotificationDropdown();
     
     // Load notifications
@@ -22,6 +22,58 @@ document.addEventListener('DOMContentLoaded', function() {
         lazyLoadImages();
     }
 });
+
+/**
+ * Initialize Bottom Navigation
+ */
+function initBottomNav() {
+    // Set active state based on current page
+    setActiveNavItem();
+}
+
+/**
+ * Initialize Menu Modal
+ */
+function initMenuModal() {
+    const menuBtn = document.getElementById('menuBtn');
+    const menuModal = document.getElementById('menuModal');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuClose = document.getElementById('menuClose');
+    
+    if (!menuBtn || !menuModal || !menuOverlay) return;
+    
+    // Open menu
+    menuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menuModal.classList.add('active');
+        menuOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    // Close menu
+    const closeMenu = () => {
+        menuModal.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+    
+    if (menuClose) {
+        menuClose.addEventListener('click', closeMenu);
+    }
+    
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', closeMenu);
+    }
+    
+    // Close menu when clicking menu items
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        // Don't close if it's the theme toggle
+        if (!item.classList.contains('theme-toggle')) {
+            item.addEventListener('click', closeMenu);
+        }
+    });
+}
 
 /**
  * Load notifications from server
@@ -56,8 +108,10 @@ function updateNotificationList(notifications) {
     if (notifications.length === 0) {
         notificationList.innerHTML = `
             <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                <i class="fas fa-bell-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                <p>No notifications</p>
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+                    <i class="fas fa-bell-slash" style="opacity: 0.5;"></i>
+                </div>
+                <div style="font-size: 1.1rem;">No notifications</div>
             </div>
         `;
         return;
@@ -166,75 +220,13 @@ function loadSavedTheme() {
 }
 
 /**
- * Initialize theme toggle functionality
- */
-function initThemeToggle() {
-    const themeToggle = document.getElementById('themeToggle');
-    
-    if (!themeToggle) return;
-    
-    updateThemeToggleUI();
-    
-    themeToggle.addEventListener('click', function() {
-        const body = document.body;
-        const isLightMode = body.classList.contains('light-theme');
-        
-        if (isLightMode) {
-            body.classList.remove('light-theme');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            body.classList.add('light-theme');
-            localStorage.setItem('theme', 'light');
-        }
-        
-        updateThemeToggleUI();
-        
-        themeToggle.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            themeToggle.style.transform = 'scale(1)';
-        }, 150);
-    });
-}
-
-/**
- * Update theme toggle button UI
- */
-function updateThemeToggleUI() {
-    const themeToggle = document.getElementById('themeToggle');
-    if (!themeToggle) return;
-    
-    const icon = themeToggle.querySelector('.theme-toggle-content i');
-    const text = themeToggle.querySelector('.theme-toggle-content span');
-    const body = document.body;
-    const isLightMode = body.classList.contains('light-theme');
-    
-    if (isLightMode) {
-        if (icon) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-        }
-        if (text) {
-            text.textContent = 'Light Mode';
-        }
-    } else {
-        if (icon) {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-        }
-        if (text) {
-            text.textContent = 'Dark Mode';
-        }
-    }
-}
-
-/**
  * Initialize notification dropdown functionality
  */
 function initNotificationDropdown() {
     const notificationBtn = document.getElementById('notificationBtn');
     const notificationDropdown = document.getElementById('notificationDropdown');
     const notificationClose = document.getElementById('notificationClose');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuOverlay = document.getElementById('menuOverlay');
     
     if (!notificationBtn || !notificationDropdown) return;
     
@@ -244,14 +236,16 @@ function initNotificationDropdown() {
         
         if (isActive) {
             notificationDropdown.classList.remove('active');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.remove('active');
+            if (menuOverlay) {
+                menuOverlay.classList.remove('active');
             }
+            document.body.style.overflow = '';
         } else {
             notificationDropdown.classList.add('active');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.add('active');
+            if (menuOverlay) {
+                menuOverlay.classList.add('active');
             }
+            document.body.style.overflow = 'hidden';
             
             // Reload notifications saat dibuka
             loadNotifications();
@@ -262,20 +256,21 @@ function initNotificationDropdown() {
         notificationClose.addEventListener('click', function(e) {
             e.stopPropagation();
             notificationDropdown.classList.remove('active');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.remove('active');
+            if (menuOverlay) {
+                menuOverlay.classList.remove('active');
             }
+            document.body.style.overflow = '';
         });
     }
     
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', function() {
             notificationDropdown.classList.remove('active');
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) {
-                sidebar.classList.remove('active');
+            const menuModal = document.getElementById('menuModal');
+            if (menuModal) {
+                menuModal.classList.remove('active');
             }
-            sidebarOverlay.classList.remove('active');
+            menuOverlay.classList.remove('active');
             document.body.style.overflow = '';
         });
     }
@@ -307,88 +302,11 @@ function initNotificationDropdown() {
 }
 
 /**
- * Initialize sidebar functionality
- * UPDATED: Sidebar starts closed, no auto-open
- */
-function initSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    
-    // Always start with sidebar closed
-    sidebar.classList.remove('active');
-    if (sidebarOverlay) {
-        sidebarOverlay.classList.remove('active');
-    }
-    document.body.style.overflow = '';
-    
-    // Mobile menu button - toggle sidebar
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.toggle('active');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.toggle('active');
-            }
-            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
-        });
-    }
-    
-    // Sidebar close button
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.remove('active');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.remove('active');
-            }
-            document.body.style.overflow = '';
-        });
-    }
-    
-    // Click overlay to close
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-    
-    // Close sidebar when clicking nav item
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-        item.addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.remove('active');
-            }
-            document.body.style.overflow = '';
-        });
-    });
-    
-    // Handle window resize
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            // Always keep sidebar closed on resize
-            sidebar.classList.remove('active');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.remove('active');
-            }
-            document.body.style.overflow = '';
-        }, 250);
-    });
-}
-
-/**
  * Set active navigation item based on current page
  */
 function setActiveNavItem() {
     const currentPath = window.location.pathname;
-    const navItems = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.bottom-nav-item');
     
     navItems.forEach(item => {
         const href = item.getAttribute('href');
