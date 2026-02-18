@@ -13,6 +13,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}
+    <style>
+        /* Hanya geser elemen fixed yang kecil (tombol), bukan popup besar */
+        body > div[style*="fixed"],
+        body > div[style*="position: fixed"],
+        body > div[style*="position:fixed"] {
+            bottom: 65px !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Main Content -->
@@ -318,5 +326,69 @@
     {% block extra_js %}{% endblock %}
     <script src="https://pl28641133.effectivegatecpm.com/8b/96/a4/8b96a43c98aecec93f1d8bf33003a4fc.js"></script>
     <script src="https://pl28657674.effectivegatecpm.com/8e/73/23/8e73236a6460c851945d5d5649c0fb70.js"></script>
+    <script type="text/javascript" src="https://storage.sociabuzz.com/storage/js/main/buttononwebsite/index.min.js"></script>
+    <script>sbBoW.draw("dayynime","QmVyaSBEdWt1bmdhbg","position-bottom-right","#3b82f6","#FFFFFF")</script>
+    <script>
+        // Fix posisi tombol SociaBuzz
+        // Hanya geser elemen fixed yang KECIL (tombol), bukan popup/modal besar
+        function fixSociabuzzBtn() {
+            document.querySelectorAll('body > *').forEach(function(el) {
+                // Skip elemen milik kita
+                if (el.tagName === 'SCRIPT' || el.tagName === 'NAV' ||
+                    el.classList.contains('main-content') ||
+                    el.classList.contains('bottom-nav') ||
+                    el.classList.contains('menu-modal') ||
+                    el.classList.contains('menu-overlay')) return;
+
+                var cs = window.getComputedStyle(el);
+                if (cs.position !== 'fixed') return;
+
+                // Cek ukuran elemen — hanya geser jika KECIL (tombol, bukan popup)
+                var rect = el.getBoundingClientRect();
+                var isSmallButton = rect.width < 300 && rect.height < 120;
+
+                if (isSmallButton) {
+                    // Hanya geser bottom, jangan ganggu left/right
+                    el.style.setProperty('bottom', '65px', 'important');
+                }
+                // Popup besar (form donasi) dibiarkan, jadi tetap di tengah
+            });
+        }
+        [200, 600, 1200, 2500].forEach(function(t) { setTimeout(fixSociabuzzBtn, t); });
+
+        // Fix menu buka/tutup
+        (function() {
+            function initMenu() {
+                var menuBtn     = document.getElementById('menuBtn');
+                var menuClose   = document.getElementById('menuClose');
+                var menuOverlay = document.getElementById('menuOverlay');
+                var menuModal   = document.getElementById('menuModal');
+                if (!menuBtn || !menuClose || !menuOverlay || !menuModal) return;
+                function openMenu() {
+                    menuModal.classList.add('active');
+                    menuOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+                function closeMenu() {
+                    menuModal.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+                var newBtn   = menuBtn.cloneNode(true);
+                var newClose = menuClose.cloneNode(true);
+                menuBtn.parentNode.replaceChild(newBtn, menuBtn);
+                menuClose.parentNode.replaceChild(newClose, menuClose);
+                newBtn.addEventListener('click', openMenu);
+                newClose.addEventListener('click', closeMenu);
+                menuOverlay.addEventListener('click', closeMenu);
+                document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeMenu(); });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initMenu);
+            } else { initMenu(); }
+        })();
+
+        window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); });
+    </script>
 </body>
 </html>
