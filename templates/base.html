@@ -4,21 +4,896 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="pTKv7RdKpXBtLCnGaf4YM9U_aXpx4uzHnyL2mm3Kn3s" />
-    <meta name="description" content="DAYYdesu - Nonton Anime Sub Indo">
-    <meta property="og:title" content="DAYYdesu">
-    <meta property="og:site_name" content="DAYYdesu">
-    <meta property="og:description" content="Nonton Anime Sub Indo">
     <title>{% block title %}DayyDesu{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}
     <style>
-        /* Hanya geser elemen fixed yang kecil (tombol), bukan popup besar */
         body > div[style*="fixed"],
         body > div[style*="position: fixed"],
         body > div[style*="position:fixed"] {
             bottom: 65px !important;
+        }
+
+        /* ══════════════════════════════════════════
+           FUTURISTIC CYBER THEME — BASE LAYOUT
+           Konsisten dengan detail.html & home.html
+        ══════════════════════════════════════════ */
+
+        /* ── DESIGN TOKENS ── */
+        :root {
+            --c-cyan:       #40c8ff;
+            --c-purple:     #8855ff;
+            --c-cyan-08:    rgba(64, 200, 255, 0.08);
+            --c-cyan-12:    rgba(64, 200, 255, 0.12);
+            --c-cyan-20:    rgba(64, 200, 255, 0.20);
+            --c-cyan-35:    rgba(64, 200, 255, 0.35);
+            --c-bg:         #060b16;
+            --c-card:       #0a1020;
+            --c-elevated:   #0e1628;
+            --c-grid:       rgba(64, 200, 255, 0.045);
+            --c-text:       #d8eeff;
+            --c-text-dim:   rgba(160, 200, 230, 0.55);
+            --c-border:     rgba(64, 200, 255, 0.18);
+            --font-hud:     'Rajdhani', sans-serif;
+            --font-body:    'Exo 2', sans-serif;
+        }
+
+        body.light-theme {
+            --c-cyan:       #0090cc;
+            --c-purple:     #6633cc;
+            --c-cyan-08:    rgba(0, 144, 204, 0.07);
+            --c-cyan-12:    rgba(0, 144, 204, 0.10);
+            --c-cyan-20:    rgba(0, 144, 204, 0.18);
+            --c-cyan-35:    rgba(0, 144, 204, 0.32);
+            --c-bg:         #f0f4f8;
+            --c-card:       #ffffff;
+            --c-elevated:   #e8edf4;
+            --c-grid:       rgba(0, 144, 204, 0.06);
+            --c-text:       #0d1f35;
+            --c-text-dim:   rgba(30, 60, 100, 0.50);
+            --c-border:     rgba(0, 144, 204, 0.20);
+        }
+
+        /* ── BASE RESET ── */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--c-bg);
+            color: var(--c-text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Subtle cyber grid background */
+            background-image:
+                linear-gradient(var(--c-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .main-content {
+            padding-bottom: 70px; /* space for bottom nav */
+        }
+
+        /* ══════════════════════════════════════════
+           TOPBAR
+        ══════════════════════════════════════════ */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 1rem;
+            height: 56px;
+            background: rgba(6, 11, 22, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--c-border);
+            box-shadow: 0 1px 0 var(--c-grid), 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        body.light-theme .topbar {
+            background: rgba(240, 244, 248, 0.90);
+            box-shadow: 0 1px 0 var(--c-border), 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        /* ── LOGO ── */
+        .topbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(64,200,255,0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+        }
+
+        .logo-icon i {
+            color: #fff;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-title {
+            font-family: var(--font-hud);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--c-text);
+            line-height: 1;
+        }
+
+        /* ── SEARCH ── */
+        .search-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-form {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            color: var(--c-cyan);
+            font-size: 0.8rem;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.55rem 1rem 0.55rem 2.25rem;
+            background: var(--c-cyan-08);
+            border: 1px solid var(--c-border);
+            border-radius: 4px;
+            color: var(--c-text);
+            font-family: var(--font-hud);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--c-text-dim);
+        }
+
+        .search-input:focus {
+            border-color: var(--c-cyan);
+            background: var(--c-cyan-12);
+            box-shadow: 0 0 0 2px rgba(64,200,255,0.12), 0 0 16px rgba(64,200,255,0.1);
+        }
+
+        body.light-theme .search-input {
+            background: rgba(0, 144, 204, 0.06);
+        }
+
+        body.light-theme .search-input:focus {
+            background: rgba(0, 144, 204, 0.10);
+            box-shadow: 0 0 0 2px rgba(0,144,204,0.12);
+        }
+
+        /* ── TOPBAR ACTIONS ── */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .action-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            background: var(--c-cyan-08);
+            border: 1px solid var(--c-border);
+            border-radius: 4px;
+            color: var(--c-text-dim);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--c-cyan);
+            color: var(--c-cyan);
+            background: var(--c-cyan-12);
+            box-shadow: 0 0 12px rgba(64,200,255,0.2);
+        }
+
+        .action-btn .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--c-cyan);
+            color: var(--c-bg);
+            font-family: var(--font-hud);
+            font-size: 0.55rem;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+        }
+
+        /* ── PAGE CONTENT ── */
+        .content-wrapper {
+            padding: 1.75rem 1rem;
+        }
+
+        /* ══════════════════════════════════════════
+           BOTTOM NAVIGATION
+        ══════════════════════════════════════════ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            display: flex;
+            align-items: stretch;
+            height: 58px;
+            background: rgba(6, 11, 22, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--c-border);
+            box-shadow: 0 -1px 0 var(--c-grid), 0 -8px 24px rgba(0,0,0,0.4);
+        }
+
+        body.light-theme .bottom-nav {
+            background: rgba(240, 244, 248, 0.96);
+            box-shadow: 0 -1px 0 var(--c-border), 0 -4px 16px rgba(0,0,0,0.08);
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            color: var(--c-text-dim);
+            text-decoration: none;
+            font-family: var(--font-hud);
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s ease;
+            padding: 0;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.05rem;
+            transition: all 0.25s ease;
+        }
+
+        /* Active state via JS (handled by main.js) */
+        .bottom-nav-item.active,
+        .bottom-nav-item:hover {
+            color: var(--c-cyan);
+        }
+
+        .bottom-nav-item.active i,
+        .bottom-nav-item:hover i {
+            filter: drop-shadow(0 0 6px rgba(64,200,255,0.5));
+        }
+
+        /* Active indicator line at top */
+        .bottom-nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--c-cyan), transparent);
+            border-radius: 0 0 2px 2px;
+            box-shadow: 0 0 8px rgba(64,200,255,0.5);
+        }
+
+        /* Bookmark count badge */
+        .nav-badge {
+            position: absolute;
+            top: 6px;
+            right: calc(50% - 20px);
+            background: var(--c-cyan);
+            color: var(--c-bg);
+            font-family: var(--font-hud);
+            font-size: 0.55rem;
+            font-weight: 700;
+            min-width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+        }
+
+        /* ══════════════════════════════════════════
+           MENU MODAL & OVERLAY
+        ══════════════════════════════════════════ */
+        /* ══════════════════════════════════════════
+           MENU OVERLAY
+        ══════════════════════════════════════════ */
+        .menu-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(3, 6, 14, 0.82);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 300 !important;
+            opacity: 0;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease;
+            will-change: opacity;
+        }
+        body.light-theme .menu-overlay { background: rgba(0,0,0,0.5); }
+        .menu-overlay.active {
+            opacity: 1;
+            pointer-events: auto !important;
+        }
+
+        /* ══════════════════════════════════════════
+           MENU MODAL SHELL — BOTTOM SHEET
+        ══════════════════════════════════════════ */
+        .menu-modal {
+            position: fixed !important;
+            left: 0 !important; right: 0 !important; bottom: 0 !important;
+            top: auto !important;
+            width: 100% !important;
+            max-height: 82vh;
+            z-index: 400 !important;
+            transform: translateY(100%);
+            transition: transform 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex !important;
+            flex-direction: column;
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            will-change: transform;
+            /* GPU layer promotion */
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .menu-modal.active {
+            transform: translateY(0);
+        }
+
+        .menu-modal-content {
+            height: 100%;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #0a1020 0%, #070d1c 100%);
+            border-top: 1px solid var(--c-border);
+            overflow: hidden;
+            position: relative;
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* Cyber grid texture overlay on panel */
+        .menu-modal-content::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(64,200,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(64,200,255,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glowing top edge line */
+        .menu-modal-content::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(to right,
+                transparent 0%,
+                var(--c-purple) 20%,
+                var(--c-cyan) 50%,
+                var(--c-purple) 80%,
+                transparent 100%);
+            box-shadow: 0 0 16px rgba(64,200,255,0.4);
+            z-index: 1;
+        }
+
+        body.light-theme .menu-modal-content {
+            background: linear-gradient(180deg, #f0f4f8 0%, #e8edf4 100%);
+        }
+        body.light-theme .menu-modal-content::before {
+            background-image:
+                linear-gradient(rgba(0,144,204,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,144,204,0.04) 1px, transparent 1px);
+        }
+
+        /* ── SCROLLABLE INNER ── */
+        .menu-scroll-inner {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--c-border) transparent;
+        }
+        .menu-scroll-inner::-webkit-scrollbar { width: 3px; }
+        .menu-scroll-inner::-webkit-scrollbar-track { background: transparent; }
+        .menu-scroll-inner::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 2px; }
+
+        /* ══════════════════════════════════════════
+           MENU HEADER — bottom sheet style
+        ══════════════════════════════════════════ */
+        .menu-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1.25rem 0.9rem;
+            border-bottom: 1px solid var(--c-border);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        /* Drag handle pill at top */
+        .menu-modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px; height: 3px;
+            background: var(--c-border);
+            border-radius: 99px;
+        }
+
+        /* Subtle cyan glow at bottom of header */
+        .menu-modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 15%; right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--c-cyan), transparent);
+            box-shadow: 0 0 8px rgba(64,200,255,0.4);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px rgba(64,200,255,0.4);
+            flex-shrink: 0;
+        }
+
+        .logo .logo-icon i {
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .logo-text { display: flex; flex-direction: column; gap: 1px; }
+
+        .logo .logo-title {
+            font-family: var(--font-hud);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--c-text);
+            line-height: 1;
+        }
+
+        .logo-subtitle {
+            font-family: var(--font-hud);
+            font-size: 0.58rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--c-cyan);
+            opacity: 0.65;
+        }
+
+        /* Close button */
+        .menu-close {
+            width: 32px; height: 32px;
+            background: var(--c-cyan-08);
+            border: 1px solid var(--c-border);
+            border-radius: 4px;
+            color: var(--c-text-dim);
+            font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .menu-close:hover {
+            border-color: var(--c-cyan);
+            color: var(--c-cyan);
+            background: var(--c-cyan-12);
+            box-shadow: 0 0 12px rgba(64,200,255,0.25);
+            transform: rotate(90deg);
+        }
+
+        /* ══════════════════════════════════════════
+           MENU BODY — bottom sheet layout
+        ══════════════════════════════════════════ */
+        .menu-modal-body {
+            flex: 1;
+            padding: 0.75rem 0 0.5rem;
+            overflow-y: auto;
+        }
+
+        .menu-section {
+            padding: 0.5rem 0;
+        }
+
+        .menu-section + .menu-section {
+            border-top: 1px solid var(--c-border);
+        }
+
+        .menu-section-title {
+            font-family: var(--font-hud);
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--c-cyan);
+            opacity: 0.5;
+            padding: 0.25rem 1.25rem 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--c-border), transparent);
+        }
+
+        /* Browse section — 3 card grid */
+        .menu-section:nth-child(1) .menu-items-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+            padding: 0 1rem 0.5rem;
+        }
+
+        .menu-item-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 0.5rem;
+            background: var(--c-cyan-08);
+            border: 1px solid var(--c-border);
+            border-radius: 10px;
+            color: var(--c-text-dim);
+            text-decoration: none;
+            font-family: var(--font-hud);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item-card i {
+            font-size: 1.3rem;
+            color: var(--c-cyan);
+            opacity: 0.65;
+            transition: all 0.25s ease;
+            display: block;
+        }
+
+        .menu-item-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--c-cyan-12), transparent);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            border-radius: 9px;
+        }
+
+        .menu-item-card:hover::before, .menu-item-card:active::before { opacity: 1; }
+        .menu-item-card:hover, .menu-item-card:active {
+            border-color: var(--c-cyan);
+            color: var(--c-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(64,200,255,0.15);
+        }
+        .menu-item-card:hover i, .menu-item-card:active i {
+            opacity: 1;
+            filter: drop-shadow(0 0 6px rgba(64,200,255,0.6));
+        }
+
+        /* Settings & other sections — full-width list */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 0;
+            margin: 0.2rem 0.75rem;
+            color: var(--c-text);
+            text-decoration: none;
+            font-family: var(--font-hud);
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            background: none;
+            width: calc(100% - 1.5rem);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item i {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            color: var(--c-cyan);
+            opacity: 0.65;
+            flex-shrink: 0;
+            transition: all 0.22s ease;
+        }
+
+        .menu-item span {
+            padding: 0.65rem 0.5rem 0.65rem 0;
+            flex: 1;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, var(--c-cyan-08), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.28s ease;
+            border-radius: 7px;
+        }
+
+        .menu-item:hover::before { transform: translateX(0); }
+        .menu-item:hover {
+            color: var(--c-cyan);
+            border-color: var(--c-border);
+        }
+        .menu-item:hover i {
+            opacity: 1;
+            filter: drop-shadow(0 0 5px rgba(64,200,255,0.5));
+        }
+
+        .menu-item::after {
+            content: '›';
+            position: absolute;
+            right: 0.75rem;
+            font-size: 1.1rem;
+            color: var(--c-cyan);
+            opacity: 0;
+            transform: translateX(-5px);
+            transition: all 0.22s ease;
+        }
+        .menu-item:hover::after { opacity: 0.6; transform: translateX(0); }
+        .menu-item.theme-toggle::after { display: none; }
+
+        /* ── THEME TOGGLE ── */
+        .theme-toggle {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+        .theme-toggle > div { display: flex; align-items: center; }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px; height: 24px;
+            flex-shrink: 0;
+            margin-right: 0.75rem;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .toggle-switch label {
+            position: absolute; inset: 0;
+            cursor: pointer;
+            background: var(--c-cyan-08);
+            border: 1px solid var(--c-border);
+            border-radius: 99px;
+            transition: all 0.3s ease;
+        }
+        .toggle-switch label::before {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 16px; height: 16px;
+            background: var(--c-text-dim);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+        }
+        .toggle-switch input:checked + label {
+            background: var(--c-cyan-20);
+            border-color: var(--c-cyan);
+            box-shadow: 0 0 10px rgba(64,200,255,0.3);
+        }
+        .toggle-switch input:checked + label::before {
+            transform: translateX(20px);
+            background: var(--c-cyan);
+            box-shadow: 0 0 8px rgba(64,200,255,0.7);
+        }
+
+        /* Support link */
+        .menu-item[href*="sociabuzz"] { color: #76CC11 !important; }
+        .menu-item[href*="sociabuzz"] i { color: #76CC11 !important; opacity: 1; }
+        .menu-item[href*="sociabuzz"]:hover { color: #8eee22 !important; }
+        .menu-item[href*="sociabuzz"]::before { background: linear-gradient(90deg, rgba(118,204,17,0.08), transparent); }
+        .menu-item[href*="sociabuzz"]::after { color: #76CC11; }
+
+        /* ══════════════════════════════════════════
+           SOCIAL LINKS — 3 card grid
+        ══════════════════════════════════════════ */
+        .menu-footer { padding: 0; }
+
+        .social-links-menu {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+            padding: 0.25rem 1rem 0.75rem;
+        }
+
+        .social-link-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.75rem 0.5rem;
+            color: var(--c-text-dim);
+            text-decoration: none;
+            font-family: var(--font-hud);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid var(--c-border);
+            border-radius: 10px;
+            background: var(--c-cyan-08);
+            transition: all 0.25s ease;
+            text-align: center;
+        }
+
+        .social-link-item i {
+            font-size: 1.2rem;
+            color: var(--c-cyan);
+            opacity: 0.65;
+            transition: all 0.25s ease;
+            display: block;
+        }
+
+        .social-link-item:hover {
+            color: var(--c-cyan);
+            border-color: var(--c-cyan);
+            background: var(--c-cyan-12);
+            box-shadow: 0 0 16px rgba(64,200,255,0.15);
+            transform: translateY(-2px);
+        }
+        .social-link-item:hover i { opacity: 1; filter: drop-shadow(0 0 6px rgba(64,200,255,0.6)); }
+        .social-link-item[href*="instagram"]:hover i { color: #e1306c; filter: drop-shadow(0 0 6px rgba(225,48,108,0.5)); }
+        .social-link-item[href*="discord"]:hover i   { color: #5865f2; filter: drop-shadow(0 0 6px rgba(88,101,242,0.5)); }
+        .social-link-item[href*="facebook"]:hover i  { color: #1877f2; filter: drop-shadow(0 0 6px rgba(24,119,242,0.5)); }
+
+        .copyright-text {
+            padding: 0.25rem 1.25rem 0.5rem;
+            font-family: var(--font-hud);
+            font-size: 0.62rem;
+            letter-spacing: 0.5px;
+            color: var(--c-text-dim);
+            opacity: 0.4;
+            text-align: center;
+        }
+        .copyright-text p { margin: 0; }
+
+        /* ══════════════════════════════════════════
+           MENU FOOTER
+        ══════════════════════════════════════════ */
+        .menu-modal-footer {
+            padding: 0.6rem 1.25rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+            border-top: 1px solid var(--c-border);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .menu-modal-footer::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 15%; right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--c-purple), transparent);
+            box-shadow: 0 0 6px rgba(136,85,255,0.3);
+        }
+
+        .version {
+            font-family: var(--font-hud);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--c-text-dim);
+            opacity: 0.4;
+        }
+
+        .menu-modal-footer::after {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--c-cyan);
+            box-shadow: 0 0 8px var(--c-cyan);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.7); }
         }
     </style>
 </head>
@@ -84,80 +959,97 @@
     <div class="menu-overlay" id="menuOverlay"></div>
     <div class="menu-modal" id="menuModal">
         <div class="menu-modal-content">
-            <div class="menu-modal-header">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-play"></i>
-                    </div>
-                    <div class="logo-text">
-                        <div class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</div>
-                        <div class="logo-subtitle">Nonton Anime Sub Indo</div>
-                    </div>
-                </div>
-                <button class="menu-close" id="menuClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="menu-modal-body">
-                <div class="menu-section">
-                    <div class="menu-section-title">Browse</div>
-                    <a href="/all-anime" class="menu-item">
-                        <i class="fas fa-list"></i>
-                        <span>All Anime</span>
-                    </a>
-                    <a href="/genres" class="menu-item">
-                        <i class="fas fa-theater-masks"></i>
-                        <span>Genres</span>
-                    </a>
-                    <a href="/schedule" class="menu-item">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Schedule</span>
-                    </a>
-                </div>
-                
-                <div class="menu-section">
-                    <div class="menu-section-title">Settings</div>
-                    <div class="menu-item theme-toggle" id="themeToggleMenu">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <i class="fas fa-moon"></i>
-                            <span>Dark Mode</span>
+            <div class="menu-scroll-inner">
+
+                <!-- Header -->
+                <div class="menu-modal-header">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-play"></i>
                         </div>
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="themeCheckbox">
-                            <label for="themeCheckbox"></label>
+                        <div class="logo-text">
+                            <div class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</div>
+                            <div class="logo-subtitle">Nonton Anime Sub Indo</div>
                         </div>
                     </div>
+                    <button class="menu-close" id="menuClose">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
-                <!-- Footer di dalam Menu Modal -->
-                <div class="menu-section">
-                    <div class="menu-section-title">Connect With Us</div>
-                    <div class="menu-footer">
-                        <div class="social-links-menu">
-                            <a href="https://www.instagram.com/rmdnhdyh20_?igsh=bnR2c25yd3lqaDFk" target="_blank" class="social-link-item">
-                                <i class="fab fa-instagram"></i>
-                                <span>Instagram</span>
+                <!-- Body -->
+                <div class="menu-modal-body">
+
+                    <!-- Browse -->
+                    <div class="menu-section">
+                        <div class="menu-section-title">Browse</div>
+                        <div class="menu-items-grid">
+                            <a href="/all-anime" class="menu-item-card">
+                                <i class="fas fa-th-large"></i>
+                                <span>All Anime</span>
                             </a>
-                            <a href="https://discord.gg/CEb5xgMQm" target="_blank" class="social-link-item">
-                                <i class="fab fa-discord"></i>
-                                <span>Discord</span>
+                            <a href="/genres" class="menu-item-card">
+                                <i class="fas fa-tags"></i>
+                                <span>Genres</span>
                             </a>
-                            <a href="https://www.facebook.com/4Dayy" target="_blank" class="social-link-item">
-                                <i class="fab fa-facebook"></i>
-                                <span>Facebook</span>
+                            <a href="/schedule" class="menu-item-card">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Schedule</span>
                             </a>
-                        </div>
-                        <div class="copyright-text">
-                            <p>&copy; 2026 𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪. All rights reserved.</p>
                         </div>
                     </div>
+
+                    <!-- Settings -->
+                    <div class="menu-section">
+                        <div class="menu-section-title">Settings</div>
+                        <div class="menu-item theme-toggle" id="themeToggleMenu">
+                            <div style="display:flex;align-items:center;">
+                                <i class="fas fa-moon"></i>
+                                <span>Dark Mode</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="themeCheckbox">
+                                <label for="themeCheckbox"></label>
+                            </div>
+                        </div>
+                        <a href="https://sociabuzz.com/dayynime/tribe" target="_blank" class="menu-item">
+                            <i class="fas fa-heart"></i>
+                            <span>Support DAYYdesu</span>
+                        </a>
+                    </div>
+
+                    <!-- Connect -->
+                    <div class="menu-section">
+                        <div class="menu-section-title">Connect With Us</div>
+                        <div class="menu-footer">
+                            <div class="social-links-menu">
+                                <a href="https://www.instagram.com/rmdnhdyh20_?igsh=bnR2c25yd3lqaDFk" target="_blank" class="social-link-item">
+                                    <i class="fab fa-instagram"></i>
+                                    <span>Instagram</span>
+                                </a>
+                                <a href="https://discord.gg/CEb5xgMQm" target="_blank" class="social-link-item">
+                                    <i class="fab fa-discord"></i>
+                                    <span>Discord</span>
+                                </a>
+                                <a href="https://www.facebook.com/4Dayy" target="_blank" class="social-link-item">
+                                    <i class="fab fa-facebook"></i>
+                                    <span>Facebook</span>
+                                </a>
+                            </div>
+                            <div class="copyright-text">
+                                <p>&copy; 2026 𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-            
-            <div class="menu-modal-footer">
-                <div class="version">Version 2.0.0</div>
-            </div>
+
+                <!-- Footer -->
+                <div class="menu-modal-footer">
+                    <div class="version">Version 2.0.0</div>
+                </div>
+
+            </div><!-- /menu-scroll-inner -->
         </div>
     </div>
     
@@ -185,19 +1077,9 @@
                     <i class="fas fa-star"></i>
                 </div>
                 <div class="notification-content">
-                    <div class="notification-title">Trending Minggu Ini</div>
-                    <div class="notification-text">Lihat anime populer minggu ini</div>
+                    <div class="notification-title">Update Tersedia</div>
+                    <div class="notification-text">Versi baru DAYYdesu tersedia!</div>
                     <div class="notification-time">2 jam yang lalu</div>
-                </div>
-            </div>
-            <div class="notification-item unread">
-                <div class="notification-icon">
-                    <i class="fas fa-calendar"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title">Jadwal Update</div>
-                    <div class="notification-text">Anime baru dijadwalkan hari ini</div>
-                    <div class="notification-time">5 jam yang lalu</div>
                 </div>
             </div>
             <div class="notification-item">
@@ -324,71 +1206,50 @@
     </script>
 
     {% block extra_js %}{% endblock %}
-    
+    <script src="https://pl28641133.effectivegatecpm.com/8b/96/a4/8b96a43c98aecec93f1d8bf33003a4fc.js"></script>
     <script src="https://pl28657674.effectivegatecpm.com/8e/73/23/8e73236a6460c851945d5d5649c0fb70.js"></script>
     <script type="text/javascript" src="https://storage.sociabuzz.com/storage/js/main/buttononwebsite/index.min.js"></script>
-    <script>sbBoW.draw("dayynime","QmVyaSBEdWt1bmdhbg","position-bottom-right","#3b82f6","#FFFFFF")</script>
+    <script>sbBoW.draw("dayynime","QmVyaSBEdWt1bmdhbg","position-bottom-right","#76CC11","#FFFFFF")</script>
     <script>
-        // Fix posisi tombol SociaBuzz
-        // Hanya geser elemen fixed yang KECIL (tombol), bukan popup/modal besar
+        // Fix posisi tombol SociaBuzz - hanya geser tombol kecil, bukan popup
         function fixSociabuzzBtn() {
             document.querySelectorAll('body > *').forEach(function(el) {
-                // Skip elemen milik kita
                 if (el.tagName === 'SCRIPT' || el.tagName === 'NAV' ||
                     el.classList.contains('main-content') ||
                     el.classList.contains('bottom-nav') ||
                     el.classList.contains('menu-modal') ||
                     el.classList.contains('menu-overlay')) return;
-
                 var cs = window.getComputedStyle(el);
                 if (cs.position !== 'fixed') return;
-
-                // Cek ukuran elemen — hanya geser jika KECIL (tombol, bukan popup)
                 var rect = el.getBoundingClientRect();
-                var isSmallButton = rect.width < 300 && rect.height < 120;
-
-                if (isSmallButton) {
-                    // Hanya geser bottom, jangan ganggu left/right
+                if (rect.width < 300 && rect.height < 120) {
                     el.style.setProperty('bottom', '65px', 'important');
                 }
-                // Popup besar (form donasi) dibiarkan, jadi tetap di tengah
             });
         }
         [200, 600, 1200, 2500].forEach(function(t) { setTimeout(fixSociabuzzBtn, t); });
 
-        // Fix menu buka/tutup
-        (function() {
-            function initMenu() {
-                var menuBtn     = document.getElementById('menuBtn');
-                var menuClose   = document.getElementById('menuClose');
-                var menuOverlay = document.getElementById('menuOverlay');
+        // Escape key to close menu
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
                 var menuModal   = document.getElementById('menuModal');
-                if (!menuBtn || !menuClose || !menuOverlay || !menuModal) return;
-                function openMenu() {
-                    menuModal.classList.add('active');
-                    menuOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-                function closeMenu() {
-                    menuModal.classList.remove('active');
-                    menuOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-                var newBtn   = menuBtn.cloneNode(true);
-                var newClose = menuClose.cloneNode(true);
-                menuBtn.parentNode.replaceChild(newBtn, menuBtn);
-                menuClose.parentNode.replaceChild(newClose, menuClose);
-                newBtn.addEventListener('click', openMenu);
-                newClose.addEventListener('click', closeMenu);
-                menuOverlay.addEventListener('click', closeMenu);
-                document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeMenu(); });
+                var menuOverlay = document.getElementById('menuOverlay');
+                if (menuModal)   menuModal.classList.remove('active');
+                if (menuOverlay) menuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
             }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initMenu);
-            } else { initMenu(); }
-        })();
+        });
 
         window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); });
+
+        // Pastikan menu selalu tertutup saat halaman pertama load
+        (function() {
+            var menuModal   = document.getElementById('menuModal');
+            var menuOverlay = document.getElementById('menuOverlay');
+            if (menuModal)   menuModal.classList.remove('active');
+            if (menuOverlay) menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        })();
     </script>
 </body>
 </html>
