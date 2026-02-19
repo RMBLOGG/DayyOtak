@@ -501,47 +501,54 @@ function showConfirmDialog(title, message, type = 'warning', onConfirm) {
 function showToast(message, type = 'info') {
     const existingToasts = document.querySelectorAll('.toast-notification');
     existingToasts.forEach(toast => toast.remove());
-    
+
+    const colors = {
+        success: { bg: 'rgba(45,212,160,0.15)',  border: 'rgba(45,212,160,0.6)',  icon: '#2dd4a0'  },
+        error:   { bg: 'rgba(239,68,68,0.15)',   border: 'rgba(239,68,68,0.6)',   icon: '#ef4444'  },
+        info:    { bg: 'rgba(64,200,255,0.15)',  border: 'rgba(64,200,255,0.6)',  icon: '#40c8ff'  }
+    };
+    const c = colors[type] || colors.info;
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+
     const toast = document.createElement('div');
     toast.className = `toast-notification toast-${type}`;
-    
-    const icon = type === 'success' ? 'check-circle' : 
-                 type === 'error' ? 'exclamation-circle' : 
-                 'info-circle';
-    
-    toast.innerHTML = `
-        <i class="fas fa-${icon}"></i>
-        <span>${message}</span>
-    `;
-    
-    const styles = {
-        position: 'fixed',
-        top: '100px',
-        right: '20px',
-        padding: '1rem 1.5rem',
-        background: type === 'success' ? '#22c55e' : 
-                   type === 'error' ? '#ef4444' : 
-                   '#3b82f6',
-        color: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.75rem',
-        fontWeight: '600',
-        fontSize: '0.95rem',
-        zIndex: '10000',
-        animation: 'slideInRight 0.3s ease',
-        minWidth: '250px'
-    };
-    
-    Object.assign(toast.style, styles);
+    toast.innerHTML = `<i class="fas fa-${icon}" style="color:${c.icon};font-size:14px;flex-shrink:0"></i><span>${message}</span>`;
+
+    Object.assign(toast.style, {
+        position:       'fixed',
+        top:            '76px',
+        right:          '12px',
+        display:        'inline-flex',
+        alignItems:     'center',
+        gap:            '8px',
+        padding:        '8px 14px',
+        background:     `rgba(6,11,22,0.92)`,
+        border:         `1px solid ${c.border}`,
+        borderLeft:     `3px solid ${c.icon}`,
+        borderRadius:   '4px',
+        boxShadow:      `0 4px 16px rgba(0,0,0,0.5)`,
+        color:          '#d8eeff',
+        fontFamily:     "'Rajdhani', sans-serif",
+        fontWeight:     '600',
+        fontSize:       '13px',
+        letterSpacing:  '0.3px',
+        whiteSpace:     'nowrap',
+        zIndex:         '99999',
+        backdropFilter: 'blur(10px)',
+        animation:      'toastIn 0.25s ease',
+        maxWidth:       '260px',
+        overflow:       'hidden',
+        textOverflow:   'ellipsis'
+    });
+
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
-        toast.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+    }, 2800);
 }
 
 // Add CSS animations
@@ -553,123 +560,143 @@ if (!document.getElementById('bookmark-styles')) {
             from { transform: translateX(400px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        
         @keyframes slideOutRight {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(400px); opacity: 0; }
         }
+        @keyframes toastIn {
+            from { transform: translateX(60px); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
         
         .confirm-dialog-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10001;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.25s ease;
             padding: 1rem;
         }
-        
-        .confirm-dialog-overlay.show {
-            opacity: 1;
-        }
-        
+
+        .confirm-dialog-overlay.show { opacity: 1; }
+
         .confirm-dialog-overlay.show .confirm-dialog {
             transform: scale(1);
             opacity: 1;
         }
-        
+
         .confirm-dialog {
-            background: var(--bg-card, #1a1a2e);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 450px;
+            background: #0a1020;
+            border: 1px solid rgba(64, 200, 255, 0.22);
+            border-radius: 6px;
+            padding: 1.5rem 1.25rem;
+            max-width: 320px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transform: scale(0.9);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 20px rgba(64,200,255,0.08);
+            transform: scale(0.93);
             opacity: 0;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
+            position: relative;
         }
-        
+
+        /* Corner brackets on dialog */
+        .confirm-dialog::before,
+        .confirm-dialog::after {
+            content: '';
+            position: absolute;
+            width: 12px; height: 12px;
+        }
+        .confirm-dialog::before {
+            top: 8px; left: 8px;
+            border-top: 1.5px solid #40c8ff;
+            border-left: 1.5px solid #40c8ff;
+        }
+        .confirm-dialog::after {
+            bottom: 8px; right: 8px;
+            border-bottom: 1.5px solid #40c8ff;
+            border-right: 1.5px solid #40c8ff;
+        }
+
         .confirm-dialog-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.5rem;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            background: rgba(245, 158, 11, 0.1);
-            border: 3px solid currentColor;
+            border-radius: 4px;
+            background: rgba(64, 200, 255, 0.07);
+            border: 1px solid currentColor;
         }
-        
-        .confirm-dialog-icon i {
-            font-size: 2.5rem;
-        }
-        
+
+        .confirm-dialog-icon i { font-size: 1.4rem; }
+
         .confirm-dialog-title {
-            font-size: 1.75rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--text-primary, #fff);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #d8eeff;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.6rem;
         }
-        
+
         .confirm-dialog-message {
-            font-size: 1rem;
-            color: var(--text-secondary, #aaa);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.82rem;
+            color: rgba(160, 200, 230, 0.6);
             text-align: center;
-            line-height: 1.6;
-            margin-bottom: 2rem;
+            line-height: 1.55;
+            margin-bottom: 1.25rem;
         }
-        
+
         .confirm-dialog-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 0.625rem;
         }
-        
+
         .confirm-btn-cancel,
         .confirm-btn-confirm {
-            padding: 1rem 1.5rem;
+            padding: 0.65rem 1rem;
             border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
+            border-radius: 3px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
-        
+
         .confirm-btn-cancel {
-            background: var(--bg-secondary, #16213e);
-            color: var(--text-primary, #fff);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            color: rgba(160, 200, 230, 0.7);
+            border: 1px solid rgba(64, 200, 255, 0.2);
         }
-        
         .confirm-btn-cancel:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
+            border-color: rgba(64, 200, 255, 0.5);
+            color: #d8eeff;
         }
-        
+
         .confirm-btn-confirm {
-            color: white;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+            color: #060b16;
+            font-weight: 800;
         }
-        
         .confirm-btn-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+            filter: brightness(1.15);
+            box-shadow: 0 0 12px rgba(245,158,11,0.3);
         }
         
         /* Bookmark Item Wrapper */
