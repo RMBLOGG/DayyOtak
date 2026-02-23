@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="pTKv7RdKpXBtLCnGaf4YM9U_aXpx4uzHnyL2mm3Kn3s" />
     <title>{% block title %}DayyDesu{% endblock %}</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#060b16">
     <!-- Favicon & PWA -->
     <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon.png') }}">
@@ -118,30 +122,19 @@
         }
 
         .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 12px rgba(64,200,255,0.35);
-            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 0 12px rgba(64,200,255,0.4);
+            flex-shrink: 0;
         }
 
-        .logo-icon::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-        }
-
-        .logo-icon i {
-            color: #fff;
-            font-size: 0.85rem;
-            position: relative;
-            z-index: 1;
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .logo-title {
@@ -151,6 +144,12 @@
             letter-spacing: 1px;
             color: var(--c-text);
             line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* Tampilkan title hanya jika layar cukup lebar */
+        @media (max-width: 360px) {
+            .logo-title { display: none; }
         }
 
         /* ── SEARCH ── */
@@ -261,6 +260,14 @@
         /* ── PAGE CONTENT ── */
         .content-wrapper {
             padding: 1.75rem 1rem;
+        }
+
+        /* Hero slider breakout - full width tanpa padding */
+        .hero-slider {
+            margin-left: -1rem;
+            margin-right: -1rem;
+            margin-top: -1.75rem;
+            width: calc(100% + 2rem);
         }
 
         /* ══════════════════════════════════════════
@@ -900,6 +907,45 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50%       { opacity: 0.4; transform: scale(0.7); }
         }
+        /* ══ SEARCH MODAL ══ */
+        .search-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); z-index: 9999;
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            align-items: flex-start; justify-content: center; padding-top: 70px;
+        }
+        .search-modal-overlay.active { display: flex; }
+        .search-modal-box {
+            width: 92%; max-width: 500px;
+            background: var(--c-elevated); border: 1px solid var(--c-border);
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.7), 0 0 24px rgba(64,200,255,0.1);
+            animation: smIn 0.2s ease;
+        }
+        @keyframes smIn {
+            from { opacity:0; transform: translateY(-20px) scale(0.96); }
+            to   { opacity:1; transform: translateY(0) scale(1); }
+        }
+        .sm-inner { display:flex; align-items:center; gap:0.75rem; padding:0.9rem 1rem; }
+        .sm-inner > i { color:var(--c-cyan); opacity:0.8; flex-shrink:0; }
+        .sm-inp {
+            flex:1; background:transparent; border:none; outline:none;
+            color:var(--c-text); font-family:var(--font-hud);
+            font-size:1.05rem; font-weight:500; letter-spacing:0.5px;
+        }
+        .sm-inp::placeholder { color:var(--c-text-dim); }
+        .sm-close { background:none; border:none; cursor:pointer; color:var(--c-text-dim); font-size:1rem; padding:4px 8px; border-radius:4px; }
+        .sm-close:hover { color:var(--c-cyan); }
+        .sm-divider { height:1px; background:var(--c-border); }
+        .sm-footer { padding:0.7rem 1rem; display:flex; justify-content:flex-end; }
+        .sm-btn {
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            color:#fff; border:none; border-radius:6px; padding:0.5rem 1.4rem;
+            font-family:var(--font-hud); font-size:0.9rem; font-weight:700;
+            letter-spacing:1px; cursor:pointer;
+        }
+        .sm-btn:hover { opacity:0.85; }
+
     </style>
 </head>
 <body>
@@ -907,26 +953,18 @@
     <div class="main-content">
         <!-- Top Navigation Bar -->
         <header class="topbar">
-            <div class="topbar-logo">
+            <a href="/" class="topbar-logo">
                 <div class="logo-icon">
-                    <i class="fas fa-play"></i>
+                    <img src="{{ url_for('static', filename='img/favicon.png') }}" alt="DAYYdesu">
                 </div>
-                <div class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</div>
-            </div>
-            
-            <div class="search-wrapper">
-                <form action="/search" method="get" class="search-form" onsubmit="searchAnime(event)">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" name="q" class="search-input" placeholder="Cari anime..." required>
-                </form>
-            </div>
-            
-            <div class="topbar-actions">
-                <button class="action-btn notification-btn" id="notificationBtn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">3</span>
-                </button>
-            </div>
+                <span class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</span>
+            </a>
+
+            <div style="flex:1;"></div>
+
+            <button onclick="openSearchModal()" style="width:40px;height:40px;flex-shrink:0;border-radius:8px;background:rgba(64,200,255,0.1);border:1px solid rgba(64,200,255,0.25);color:var(--c-cyan);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                <i class="fas fa-search"></i>
+            </button>
         </header>
         
         <!-- Page Content -->
@@ -970,7 +1008,7 @@
                 <div class="menu-modal-header">
                     <div class="logo">
                         <div class="logo-icon">
-                            <i class="fas fa-play"></i>
+                            <img src="{{ url_for('static', filename='img/favicon.png') }}" alt="DAYYdesu" style="width:100%;height:100%;object-fit:cover;border-radius:6px;display:block;">
                         </div>
                         <div class="logo-text">
                             <div class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</div>
@@ -1103,6 +1141,35 @@
         </div>
     </div> -->
     
+    <!-- Search Modal -->
+    <div class="search-modal-overlay" id="searchModalOverlay" onclick="if(event.target===this)closeSearchModal()">
+        <div class="search-modal-box">
+            <div class="sm-inner">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchModalInput" class="sm-inp" placeholder="Cari anime..."
+                    onkeydown="if(event.key==='Enter')submitSearch();if(event.key==='Escape')closeSearchModal()">
+                <button class="sm-close" onclick="closeSearchModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sm-divider"></div>
+            <div class="sm-footer">
+                <button class="sm-btn" onclick="submitSearch()">CARI</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openSearchModal(){
+            document.getElementById('searchModalOverlay').classList.add('active');
+            setTimeout(function(){ document.getElementById('searchModalInput').focus(); },80);
+        }
+        function closeSearchModal(){
+            document.getElementById('searchModalOverlay').classList.remove('active');
+        }
+        function submitSearch(){
+            var v=document.getElementById('searchModalInput').value.trim();
+            if(v) window.location.href='/search?q='+encodeURIComponent(v);
+        }
+    </script>
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
         // Theme Toggle Function
@@ -1211,7 +1278,7 @@
     </script>
 
     {% block extra_js %}{% endblock %}
-    <script src="https://pl28641133.effectivegatecpm.com/8b/96/a4/8b96a43c98aecec93f1d8bf33003a4fc.js"></script>
+    <!-- <script src="https://pl28641133.effectivegatecpm.com/8b/96/a4/8b96a43c98aecec93f1d8bf33003a4fc.js"></script> -->
     <script src="https://pl28657674.effectivegatecpm.com/8e/73/23/8e73236a6460c851945d5d5649c0fb70.js"></script>
     <script type="text/javascript" src="https://storage.sociabuzz.com/storage/js/main/buttononwebsite/index.min.js"></script>
     <script>sbBoW.draw("dayynime","QmVyaSBEdWt1bmdhbg","position-bottom-right","#010076c4","#ffffff")</script>
