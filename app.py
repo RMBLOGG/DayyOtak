@@ -1,141 +1,142 @@
 from flask import Flask, render_template, jsonify, request, Response, send_file
 import requests
+from functools import lru_cache
 from datetime import datetime, timedelta
+import json
 import os
 import hashlib
-import threading
-import time
+from io import BytesIO
 
 app = Flask(__name__)
 API_BASE = "https://www.sankavollerei.com"
 
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'application/json, text/plain, */*',
-    'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
-    'Referer': 'https://www.sankavollerei.com/',
-    'Origin': 'https://www.sankavollerei.com',
-    'Connection': 'keep-alive',
-}
-
 # ============ VERCEL SERVERLESS STORAGE ============
+# Note: Vercel doesn't support SQLite or background tasks
+# Using in-memory storage (will reset on cold start)
 NOTIFICATIONS = []
 
-# ============ CACHE SYSTEM ============
+# Simple cache for Vercel (in-memory)
 CACHE = {}
 CACHE_DURATION = {
-    'home': 600,       # 10 menit
-    'ongoing': 600,    # 10 menit
-    'completed': 900,  # 15 menit
-    'schedule': 3600,  # 60 menit
-    'unlimited': 3600, # 60 menit
-    'genre': 3600,     # 60 menit
-    'anime': 1800,     # 30 menit
-    'episode': 3600,   # 60 menit
-    'search': 300,     # 5 menit
-    'server': 120,     # 2 menit
-    'batch': 1800,     # 30 menit
+    'home': 300,
+    'ongoing': 300,
+    'completed': 600,
+    'schedule': 1800,
+    'unlimited': 3600,
+    'genre': 3600,
+    'anime': 600,
+    'episode': 300,
+    'search': 300,
+    'server': 60,
+    'batch': 600
 }
 
-# ============ RATE LIMITER ============
-# Maks 55 req/menit (aman di bawah limit 70)
-_req_lock = threading.Lock()
-_req_times = []
-MAX_RPM = 55
+# ============ IMAGE CACHE CONFIGURATION ============
+# Cache poster images selama 30 hari untuk menghindari rate limit API
+IMAGE_CACHE_DIR = 'static/poster_cache'
+IMAGE_CACHE_DURATION_DAYS = 30  # Cache 30 hari
+IMAGE_CACHE = {}  # In-memory metadata {url: {'path': ..., 'cached_at': ..., 'hits': ...}}
 
-def _rate_limit_wait():
-    with _req_lock:
-        now = time.time()
-        # Buang timestamp > 60 detik
-        while _req_times and now - _req_times[0] > 60:
-            _req_times.pop(0)
-        if len(_req_times) >= MAX_RPM:
-            wait = 61 - (now - _req_times[0])
-            print(f"⏳ Rate limit hit, tunggu {wait:.1f}s")
-            time.sleep(max(wait, 0))
-        _req_times.append(time.time())
-
-# ============ IMAGE CACHE (In-Memory only - Vercel read-only FS) ============
-IMAGE_CACHE = {}  # {url: {'content': bytes, 'mimetype': str, 'cached_at': datetime}}
-IMAGE_CACHE_DURATION = timedelta(hours=6)  # 6 jam in-memory
+# Create cache directory
+os.makedirs(IMAGE_CACHE_DIR, exist_ok=True)
 
 def get_from_cache(cache_key):
+    """Get data from memory cache"""
     if cache_key in CACHE:
         cached_time, cache_type, data = CACHE[cache_key]
-        max_age = CACHE_DURATION.get(cache_type, 600)
+        max_age = CACHE_DURATION.get(cache_type, 300)
+        
         if datetime.now() - cached_time < timedelta(seconds=max_age):
             return data
     return None
 
 def save_to_cache(cache_key, data, cache_type='home'):
+    """Save data to memory cache"""
     CACHE[cache_key] = (datetime.now(), cache_type, data)
 
 def fetch_api(endpoint, cache_type='home'):
-    """Fetch data dari API dengan cache + rate limiter + retry otomatis"""
+    """Fetch data from API with caching"""
     cache_key = f"{cache_type}_{endpoint}"
-
-    # Cek cache dulu
+    
+    # Try cache first
     cached_data = get_from_cache(cache_key)
     if cached_data is not None:
-        print(f"✅ Cache HIT: {endpoint}")
         return cached_data
-
-    print(f"🌐 API Request: {endpoint}")
-
-    # Rate limit check
-    _rate_limit_wait()
-
-    last_error = None
-    for attempt in range(3):  # Retry 3x
-        try:
-            response = requests.get(
-                f"{API_BASE}{endpoint}",
-                headers=HEADERS,
-                timeout=15
-            )
-
-            if response.status_code in (403, 429):
-                wait = (attempt + 1) * 6  # 6s, 12s, 18s
-                print(f"⚠️ Rate limited ({response.status_code}), retry {attempt+1}/3 dalam {wait}s")
-                time.sleep(wait)
-                continue
-
-            response.raise_for_status()
-            data = response.json()
-            save_to_cache(cache_key, data, cache_type)
-            return data
-
-        except Exception as e:
-            last_error = e
-            if attempt < 2:
-                time.sleep(3)
-
-    # Semua retry gagal - pakai stale cache jika ada
-    if cache_key in CACHE:
-        print(f"⚠️ Pakai stale cache: {endpoint}")
-        return CACHE[cache_key][2]
-
-    return {"status": "error", "message": str(last_error)}
+    
+    try:
+        response = requests.get(f"{API_BASE}{endpoint}", timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Save to cache
+        save_to_cache(cache_key, data, cache_type)
+        
+        return data
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "message": str(e)}
 
 # ============ IMAGE PROXY FUNCTIONS ============
-# Note: Vercel filesystem read-only, pakai in-memory cache
+
+def get_image_cache_path(url):
+    """Generate cache filename dari URL"""
+    url_hash = hashlib.md5(url.encode()).hexdigest()
+    return os.path.join(IMAGE_CACHE_DIR, f'{url_hash}.jpg')
 
 def is_image_cached(url):
-    """Check apakah image ada di in-memory cache dan masih valid"""
+    """Check apakah image sudah di-cache DAN masih valid"""
+    cache_path = get_image_cache_path(url)
+    
+    # Check file exists
+    if not os.path.exists(cache_path):
+        return False
+    
+    # Check in-memory metadata
     if url in IMAGE_CACHE:
         cached_at = IMAGE_CACHE[url].get('cached_at')
-        if cached_at and datetime.now() - cached_at < IMAGE_CACHE_DURATION:
-            return True
+        if cached_at:
+            cached_date = datetime.fromisoformat(cached_at)
+            expiry_date = cached_date + timedelta(days=IMAGE_CACHE_DURATION_DAYS)
+            
+            # Jika masih valid, return True
+            if datetime.now() < expiry_date:
+                return True
+    
+    # Check file modification time as fallback
+    file_stat = os.stat(cache_path)
+    file_age = datetime.now() - datetime.fromtimestamp(file_stat.st_mtime)
+    
+    if file_age < timedelta(days=IMAGE_CACHE_DURATION_DAYS):
+        # Update in-memory cache
+        IMAGE_CACHE[url] = {
+            'path': cache_path,
+            'cached_at': datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
+            'hits': IMAGE_CACHE.get(url, {}).get('hits', 0)
+        }
+        return True
+    
     return False
 
-def cache_image(url, image_content, mimetype='image/jpeg'):
-    """Cache image ke in-memory"""
-    IMAGE_CACHE[url] = {
-        'content': image_content,
-        'mimetype': mimetype,
-        'cached_at': datetime.now(),
-        'hits': 0,
-    }
+def cache_image(url, image_content):
+    """Cache image ke disk"""
+    cache_path = get_image_cache_path(url)
+    
+    try:
+        # Save image to disk
+        with open(cache_path, 'wb') as f:
+            f.write(image_content)
+        
+        # Update in-memory metadata
+        IMAGE_CACHE[url] = {
+            'path': cache_path,
+            'cached_at': datetime.now().isoformat(),
+            'hits': 0,
+            'size': len(image_content)
+        }
+        
+        return cache_path
+    except Exception as e:
+        print(f"Error caching image: {e}")
+        return None
 
 # ============ IMAGE PROXY ROUTE ============
 
@@ -166,34 +167,53 @@ def proxy_image():
     
     # ===== CHECK CACHE FIRST (ZERO API CALLS) =====
     if is_image_cached(image_url):
-        cached = IMAGE_CACHE[image_url]
-        cached['hits'] = cached.get('hits', 0) + 1
-        response = Response(cached['content'], mimetype=cached.get('mimetype', 'image/jpeg'))
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['X-Cache-Status'] = 'HIT'
-        response.headers['Cache-Control'] = 'public, max-age=86400'
-        return response
-
+        cache_path = get_image_cache_path(image_url)
+        
+        # Update hit count
+        if image_url in IMAGE_CACHE:
+            IMAGE_CACHE[image_url]['hits'] = IMAGE_CACHE[image_url].get('hits', 0) + 1
+        
+        # Serve from disk cache
+        try:
+            response = send_file(
+                cache_path,
+                mimetype='image/jpeg',
+                as_attachment=False
+            )
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['X-Cache-Status'] = 'HIT'
+            response.headers['Cache-Control'] = f'public, max-age={60*60*24*30}'  # 30 days
+            
+            return response
+        except Exception as e:
+            print(f"Error serving cached image: {e}")
+            # Continue to fetch if cache serve fails
+    
     # ===== CACHE MISS - FETCH ONCE AND CACHE =====
     try:
-        print(f"Fetching image: {image_url}")
+        # Fetch image (ONLY ONCE per URL)
+        print(f"Fetching image from: {image_url}")
         img_response = requests.get(
             image_url,
             timeout=10,
             headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         )
         img_response.raise_for_status()
-
+        
         image_content = img_response.content
-        mimetype = img_response.headers.get('Content-Type', 'image/jpeg')
-
-        # Cache in-memory (6 jam)
-        cache_image(image_url, image_content, mimetype)
-
-        response = Response(image_content, mimetype=mimetype)
+        
+        # Cache image for 30 days
+        cache_image(image_url, image_content)
+        
+        # Return image
+        response = Response(
+            image_content,
+            mimetype=img_response.headers.get('Content-Type', 'image/jpeg')
+        )
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['X-Cache-Status'] = 'MISS'
-        response.headers['Cache-Control'] = 'public, max-age=86400'
+        response.headers['Cache-Control'] = f'public, max-age={60*60*24*30}'  # 30 days
+        
         return response
         
     except requests.exceptions.Timeout:
@@ -209,22 +229,46 @@ def proxy_image():
 
 @app.route('/api/image-cache/stats')
 def image_cache_stats():
-    total_hits = sum(c.get('hits', 0) for c in IMAGE_CACHE.values())
-    total_size = sum(len(c.get('content', b'')) for c in IMAGE_CACHE.values())
+    """Get cache statistics"""
+    total_cached = len([f for f in os.listdir(IMAGE_CACHE_DIR) if f.endswith('.jpg')])
+    total_size = sum(
+        os.path.getsize(os.path.join(IMAGE_CACHE_DIR, f))
+        for f in os.listdir(IMAGE_CACHE_DIR)
+        if f.endswith('.jpg')
+    )
+    
+    total_hits = sum(cache.get('hits', 0) for cache in IMAGE_CACHE.values())
+    
     return jsonify({
         'status': 'success',
         'data': {
-            'total_cached_images': len(IMAGE_CACHE),
+            'total_cached_images': total_cached,
             'total_size_mb': round(total_size / (1024 * 1024), 2),
             'total_hits': total_hits,
-            'cache_duration_hours': 6,
+            'cache_duration_days': IMAGE_CACHE_DURATION_DAYS,
+            'in_memory_entries': len(IMAGE_CACHE)
         }
     })
 
 @app.route('/api/image-cache/clear', methods=['POST'])
 def clear_image_cache():
-    IMAGE_CACHE.clear()
-    return jsonify({'status': 'success', 'message': 'Image cache cleared'})
+    """Clear image cache (admin only - add authentication!)"""
+    try:
+        count = 0
+        for filename in os.listdir(IMAGE_CACHE_DIR):
+            if filename.endswith('.jpg'):
+                file_path = os.path.join(IMAGE_CACHE_DIR, filename)
+                os.remove(file_path)
+                count += 1
+        
+        IMAGE_CACHE.clear()
+        
+        return jsonify({
+            'status': 'success',
+            'message': f'Cleared {count} cached images'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # ============ BOOKMARK PAGE (Client-side with localStorage) ============
 @app.route('/bookmarks')
@@ -364,6 +408,10 @@ def genre_detail(genre_id):
 def api_genre_detail(genre_id):
     data = fetch_api(f'/anime/genre/{genre_id}', 'genre')
     return jsonify(data)
+
+@app.route('/manifest.json')
+def manifest():
+    return app.send_static_file('manifest.json')
 
 # Vercel needs this
 if __name__ == '__main__':

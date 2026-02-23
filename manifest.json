@@ -1,0 +1,23 @@
+{
+  "name": "DAYYdesu",
+  "short_name": "DAYYdesu",
+  "description": "Nonton anime favoritmu di DAYYdesu",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060b16",
+  "theme_color": "#060b16",
+  "icons": [
+    {
+      "src": "/static/img/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
