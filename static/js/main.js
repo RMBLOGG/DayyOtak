@@ -404,10 +404,33 @@ function goToGenre(genreId) {
 }
 
 function searchAnime(event) {
-    event.preventDefault();
-    const keyword = document.querySelector('.search-input').value;
+    if (event) event.preventDefault();
+    const input = document.getElementById('searchModalInput') || document.querySelector('.search-input');
+    const keyword = input ? input.value : '';
     if (keyword.trim()) {
-        window.location.href = '/search?q=' + encodeURIComponent(keyword);
+        window.location.href = '/search?q=' + encodeURIComponent(keyword.trim());
+    }
+}
+
+function openSearchModal() {
+    const overlay = document.getElementById('searchModalOverlay');
+    if (!overlay) return;
+    overlay.classList.add('active');
+    setTimeout(() => {
+        const inp = document.getElementById('searchModalInput');
+        if (inp) inp.focus();
+    }, 80);
+}
+
+function closeSearchModal() {
+    const overlay = document.getElementById('searchModalOverlay');
+    if (overlay) overlay.classList.remove('active');
+}
+
+function submitSearch() {
+    const inp = document.getElementById('searchModalInput');
+    if (inp && inp.value.trim()) {
+        window.location.href = '/search?q=' + encodeURIComponent(inp.value.trim());
     }
 }
 
