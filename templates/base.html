@@ -2,9 +2,14 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="pTKv7RdKpXBtLCnGaf4YM9U_aXpx4uzHnyL2mm3Kn3s" />
     <title>{% block title %}DayyDesu{% endblock %}</title>
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#060b16">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -1206,10 +1211,10 @@
     </script>
 
     {% block extra_js %}{% endblock %}
-    
+    <script src="https://pl28641133.effectivegatecpm.com/8b/96/a4/8b96a43c98aecec93f1d8bf33003a4fc.js"></script>
     <script src="https://pl28657674.effectivegatecpm.com/8e/73/23/8e73236a6460c851945d5d5649c0fb70.js"></script>
     <script type="text/javascript" src="https://storage.sociabuzz.com/storage/js/main/buttononwebsite/index.min.js"></script>
-    <script>sbBoW.draw("dayynime","QmVyaSBEdWt1bmdhbg","position-bottom-right","#010076c4","#FFFFFF")</script>
+    <script>sbBoW.draw("dayynime","QmVyaSBEdWt1bmdhbg","position-bottom-right","#010076c4","#ffffff")</script>
     <script>
         // Fix posisi tombol SociaBuzz - hanya geser tombol kecil, bukan popup
         function fixSociabuzzBtn() {
