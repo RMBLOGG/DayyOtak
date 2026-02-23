@@ -1010,6 +1010,55 @@
             {% endif %}
         </div>
         
+
+            <!-- ============ KOMENTAR & RATING ============ -->
+            <div class="anime-section" id="commentSection" style="margin-top:2rem;">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <div class="section-accent"></div>
+                        <h2 class="section-title"><i class="fas fa-comments" style="color:var(--c-cyan);margin-right:.5rem;"></i>Komentar & Rating</h2>
+                    </div>
+                </div>
+
+                <!-- Form Komentar -->
+                <div id="commentFormWrap" style="margin-bottom:1.5rem;">
+                {% if session.get('user') %}
+                <div style="background:var(--c-card);border:1px solid var(--c-border);border-radius:6px;padding:1.25rem;">
+                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+                        <img src="{{ session.user.picture }}" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--c-border);" alt="">
+                        <span style="font-family:var(--font-hud);font-weight:600;color:var(--c-text);">{{ session.user.name }}</span>
+                    </div>
+                    <!-- Rating stars -->
+                    <div style="margin-bottom:.75rem;">
+                        <div style="font-family:var(--font-hud);font-size:.75rem;color:var(--c-text-dim);letter-spacing:.5px;margin-bottom:.4rem;">RATING (1-10)</div>
+                        <div class="star-rating" id="starRating">
+                            {% for i in range(1,11) %}
+                            <span class="star" data-val="{{ i }}" onclick="setRating({{ i }})" style="cursor:pointer;font-size:1.3rem;color:var(--c-text-dim);transition:color .15s;">★</span>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" id="ratingInput" value="0">
+                    </div>
+                    <textarea id="commentInput" placeholder="Tulis komentar kamu..." rows="3"
+                        style="width:100%;background:var(--c-elevated);border:1px solid var(--c-border);border-radius:4px;color:var(--c-text);font-family:var(--font-body);font-size:.9rem;padding:.75rem;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+                    <button onclick="submitComment()" style="margin-top:.75rem;padding:.5rem 1.25rem;background:linear-gradient(135deg,var(--c-cyan),var(--c-purple));border:none;border-radius:4px;color:#fff;font-family:var(--font-hud);font-weight:700;font-size:.85rem;letter-spacing:.5px;cursor:pointer;">
+                        <i class="fas fa-paper-plane"></i> KIRIM
+                    </button>
+                </div>
+                {% else %}
+                <div style="background:var(--c-card);border:1px solid var(--c-border);border-radius:6px;padding:1.25rem;text-align:center;">
+                    <i class="fas fa-lock" style="color:var(--c-cyan);font-size:1.5rem;margin-bottom:.5rem;display:block;"></i>
+                    <p style="color:var(--c-text-dim);font-family:var(--font-hud);margin:0 0 .75rem;">Login untuk menulis komentar</p>
+                    <a href="/login" style="padding:.5rem 1.25rem;background:linear-gradient(135deg,var(--c-cyan),var(--c-purple));border-radius:4px;color:#fff;text-decoration:none;font-family:var(--font-hud);font-weight:700;font-size:.85rem;">LOGIN</a>
+                </div>
+                {% endif %}
+                </div>
+
+                <!-- Daftar Komentar -->
+                <div id="commentList" style="display:flex;flex-direction:column;gap:.75rem;">
+                    <div style="text-align:center;color:var(--c-text-dim);padding:1rem;font-family:var(--font-hud);font-size:.8rem;">Memuat komentar...</div>
+                </div>
+            </div>
+
     {% else %}
         <div style="text-align: center; padding: 4rem 2rem;">
             <h3 style="color: var(--text-primary); margin-bottom: 1rem;">
@@ -1184,5 +1233,92 @@ document.addEventListener('DOMContentLoaded', function() {
         firstQualityPill.click();
     }
 });
+
+// ============ AUTO SAVE HISTORY ============
+(function() {
+    {% if session.get('user') and data and data.status == 'success' %}
+    fetch('/api/history/add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            episode_id:    "{{ episode_id }}",
+            episode_title: "{{ data.data.title | e }}",
+            anime_id:      "{{ data.data.animeId | e }}",
+            anime_title:   "",
+            poster:        ""
+        })
+    }).catch(()=>{});
+    {% endif %}
+})();
+
+// ============ RATING & KOMENTAR ============
+let selectedRating = 0;
+
+function setRating(val) {
+    selectedRating = val;
+    document.getElementById('ratingInput').value = val;
+    document.querySelectorAll('.star').forEach((s, i) => {
+        s.style.color = i < val ? '#f5c518' : 'var(--c-text-dim)';
+    });
+}
+
+async function submitComment() {
+    const comment = document.getElementById('commentInput')?.value?.trim();
+    const rating  = parseInt(document.getElementById('ratingInput')?.value || 0);
+    if (!comment) { alert('Komentar tidak boleh kosong!'); return; }
+    const animeId = "{{ data.data.animeId | e }}" || "{{ episode_id }}";
+    const res = await fetch('/api/comments/' + animeId, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ comment, rating })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+        document.getElementById('commentInput').value = '';
+        setRating(0);
+        loadComments();
+    } else {
+        alert(data.message || 'Gagal mengirim komentar');
+    }
+}
+
+async function loadComments() {
+    const animeId = "{{ data.data.animeId | e }}" || "{{ episode_id }}";
+    const myId    = "{{ session.user.sub if session.get('user') else '' }}";
+    const res  = await fetch('/api/comments/' + animeId);
+    const data = await res.json();
+    const list = document.getElementById('commentList');
+    if (!list) return;
+    if (!data.data || data.data.length === 0) {
+        list.innerHTML = '<div style="text-align:center;color:var(--c-text-dim);padding:1.5rem;font-family:var(--font-hud);font-size:.8rem;letter-spacing:.5px;">Belum ada komentar. Jadilah yang pertama!</div>';
+        return;
+    }
+    list.innerHTML = data.data.map(c => {
+        const stars = c.rating ? '★'.repeat(c.rating) + '<span style="color:var(--c-text-dim)">★'.repeat(10 - c.rating) + '</span>' : '';
+        const isMe  = c.user_sub === myId;
+        return `<div style="background:var(--c-card);border:1px solid var(--c-border);border-radius:6px;padding:1rem;">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;">
+                <img src="${c.user_pic}" style="width:30px;height:30px;border-radius:50%;border:1px solid var(--c-border);" onerror="this.src='/static/img/avatar.png'" alt="">
+                <div style="flex:1;">
+                    <div style="font-family:var(--font-hud);font-weight:600;font-size:.85rem;color:var(--c-text);">${c.user_name}</div>
+                    <div style="font-size:.68rem;color:var(--c-text-dim);">${c.posted_at}</div>
+                </div>
+                ${c.rating ? `<div style="color:#f5c518;font-size:.85rem;letter-spacing:1px;">${stars} <span style="color:var(--c-text-dim);font-family:var(--font-hud);font-size:.75rem;">${c.rating}/10</span></div>` : ''}
+                ${isMe ? `<button onclick="deleteComment()" style="background:rgba(255,60,60,0.1);border:1px solid rgba(255,60,60,0.2);border-radius:3px;color:#ff6060;cursor:pointer;padding:.2rem .5rem;font-size:.7rem;"><i class="fas fa-trash"></i></button>` : ''}
+            </div>
+            <p style="margin:0;font-size:.88rem;color:var(--c-text);line-height:1.5;">${c.comment}</p>
+        </div>`;
+    }).join('');
+}
+
+async function deleteComment() {
+    if (!confirm('Hapus komentar kamu?')) return;
+    const animeId = "{{ data.data.animeId | e }}" || "{{ episode_id }}";
+    await fetch('/api/comments/' + animeId + '/delete', { method: 'POST' });
+    loadComments();
+}
+
+document.addEventListener('DOMContentLoaded', loadComments);
+
 </script>
 {% endblock %}

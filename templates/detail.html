@@ -4,48 +4,47 @@
 
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
     /* ══════════════════════════════════════════
-       FUTURISTIC CYBER THEME — DETAIL PAGE
-       Konsisten dengan episode.html
-       HTML & JS tidak diubah sama sekali.
+       DAYYDESU — ANIME PINK THEME — DETAIL PAGE
+       Aesthetic: Shoujo · Sakura · Dark Romance
     ══════════════════════════════════════════ */
 
-    /* ── DESIGN TOKENS (dark mode default) ── */
+    /* ── DESIGN TOKENS ── */
     :root {
-        --c-cyan:       #40c8ff;
-        --c-purple:     #8855ff;
-        --c-cyan-08:    rgba(64, 200, 255, 0.08);
-        --c-cyan-12:    rgba(64, 200, 255, 0.12);
-        --c-cyan-20:    rgba(64, 200, 255, 0.20);
-        --c-cyan-35:    rgba(64, 200, 255, 0.35);
-        --c-bg:         #060b16;
-        --c-card:       #0a1020;
-        --c-elevated:   #0e1628;
-        --c-grid:       rgba(64, 200, 255, 0.045);
-        --c-text:       #d8eeff;
-        --c-text-dim:   rgba(160, 200, 230, 0.55);
-        --c-border:     rgba(64, 200, 255, 0.18);
-        --font-hud:     'Rajdhani', sans-serif;
-        --font-body:    'Exo 2', sans-serif;
+        --c-cyan:       #ff6eb0;
+        --c-purple:     #c0437f;
+        --c-cyan-08:    rgba(255, 110, 176, 0.08);
+        --c-cyan-12:    rgba(255, 110, 176, 0.12);
+        --c-cyan-20:    rgba(255, 110, 176, 0.20);
+        --c-cyan-35:    rgba(255, 110, 176, 0.35);
+        --c-bg:         #0d0810;
+        --c-card:       #150d18;
+        --c-elevated:   #1e1220;
+        --c-grid:       rgba(255, 110, 176, 0.035);
+        --c-text:       #fde8f2;
+        --c-text-dim:   rgba(253, 232, 242, 0.50);
+        --c-border:     rgba(255, 110, 176, 0.18);
+        --font-hud:     'Bebas Neue', sans-serif;
+        --font-body:    'Noto Sans JP', sans-serif;
     }
 
     /* ── LIGHT THEME OVERRIDES ── */
     body.light-theme {
-        --c-cyan:       #0090cc;
-        --c-purple:     #6633cc;
-        --c-cyan-08:    rgba(0, 144, 204, 0.07);
-        --c-cyan-12:    rgba(0, 144, 204, 0.10);
-        --c-cyan-20:    rgba(0, 144, 204, 0.18);
-        --c-cyan-35:    rgba(0, 144, 204, 0.32);
-        --c-bg:         #f0f4f8;
+        --c-cyan:       #d63a80;
+        --c-purple:     #a02060;
+        --c-cyan-08:    rgba(214, 58, 128, 0.07);
+        --c-cyan-12:    rgba(214, 58, 128, 0.11);
+        --c-cyan-20:    rgba(214, 58, 128, 0.18);
+        --c-cyan-35:    rgba(214, 58, 128, 0.32);
+        --c-bg:         #fff0f6;
         --c-card:       #ffffff;
-        --c-elevated:   #e8edf4;
-        --c-grid:       rgba(0, 144, 204, 0.06);
-        --c-text:       #0d1f35;
-        --c-text-dim:   rgba(30, 60, 100, 0.50);
-        --c-border:     rgba(0, 144, 204, 0.20);
+        --c-elevated:   #ffe0ee;
+        --c-grid:       rgba(214, 58, 128, 0.05);
+        --c-text:       #2a0818;
+        --c-text-dim:   rgba(42, 8, 24, 0.50);
+        --c-border:     rgba(214, 58, 128, 0.20);
     }
 
     /* ══════════════════════════════════════════
@@ -80,10 +79,10 @@
         inset: 0;
         background: linear-gradient(
             to bottom,
-            rgba(6, 11, 22, 0.72) 0%,
-            rgba(6, 11, 22, 0.85) 45%,
-            rgba(6, 11, 22, 0.96) 75%,
-            rgba(6, 11, 22, 1)    100%
+            rgba(13, 8, 16, 0.72) 0%,
+            rgba(13, 8, 16, 0.85) 45%,
+            rgba(13, 8, 16, 0.96) 75%,
+            rgba(13, 8, 16, 1)    100%
         );
     }
 
@@ -103,10 +102,10 @@
     body.light-theme .hero-backdrop::before {
         background: linear-gradient(
             to bottom,
-            rgba(240, 244, 248, 0.55) 0%,
-            rgba(240, 244, 248, 0.80) 50%,
-            rgba(240, 244, 248, 0.97) 80%,
-            rgba(240, 244, 248, 1)    100%
+            rgba(255, 240, 246, 0.55) 0%,
+            rgba(255, 240, 246, 0.80) 50%,
+            rgba(255, 240, 246, 0.97) 80%,
+            rgba(255, 240, 246, 1)    100%
         );
     }
 
@@ -134,9 +133,9 @@
         overflow: hidden;
         border: 1px solid var(--c-border);
         box-shadow:
-            0 0 0 1px rgba(64,200,255,0.08),
+            0 0 0 1px rgba(255,110,176,0.08),
             0 20px 60px rgba(0, 0, 0, 0.55),
-            0 0 30px rgba(64,200,255,0.08);
+            0 0 30px rgba(255,110,176,0.08);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -145,7 +144,7 @@
         box-shadow:
             0 0 0 1px var(--c-border),
             0 24px 70px rgba(0,0,0,0.6),
-            0 0 40px rgba(64,200,255,0.15);
+            0 0 40px rgba(255,110,176,0.15);
     }
 
     .poster-wrapper img {
@@ -177,7 +176,7 @@
     .rating-badge {
         position: absolute;
         top: 1rem; right: 1rem;
-        background: rgba(6, 11, 22, 0.88);
+        background: rgba(13, 8, 16, 0.88);
         border: 1px solid var(--c-border);
         backdrop-filter: blur(10px);
         padding: 0.45rem 0.875rem;
@@ -190,7 +189,7 @@
         align-items: center;
         gap: 0.35rem;
         color: var(--c-text);
-        box-shadow: 0 0 12px rgba(64,200,255,0.15);
+        box-shadow: 0 0 12px rgba(255,110,176,0.15);
     }
 
     .rating-badge i {
@@ -202,7 +201,7 @@
     .status-badge {
         position: absolute;
         bottom: 1rem; left: 1rem; right: 1rem;
-        background: rgba(6, 11, 22, 0.90);
+        background: rgba(13, 8, 16, 0.90);
         backdrop-filter: blur(12px);
         padding: 0.5rem 1rem;
         border-radius: 3px;
@@ -223,7 +222,7 @@
     .status-completed {
         color: var(--c-cyan);
         border: 1px solid var(--c-border);
-        box-shadow: 0 0 10px rgba(64,200,255,0.12);
+        box-shadow: 0 0 10px rgba(255,110,176,0.12);
     }
 
     /* ── INFO SECTION ── */
@@ -243,9 +242,9 @@
         position: absolute;
         left: -1.25rem; top: 0.2rem; bottom: 0.2rem;
         width: 3px;
-        background: linear-gradient(to bottom, var(--c-cyan), var(--c-purple));
+        background: var(--c-cyan);
         border-radius: 2px;
-        box-shadow: 0 0 8px rgba(64,200,255,0.4);
+        box-shadow: 0 0 8px rgba(255,110,176,0.4);
     }
 
     .anime-title {
@@ -256,7 +255,7 @@
         margin-bottom: 0.75rem;
         color: var(--c-text);
         letter-spacing: 0.5px;
-        text-shadow: 0 0 30px rgba(64,200,255,0.18);
+        text-shadow: 0 0 30px rgba(255,110,176,0.18);
     }
 
     body.light-theme .anime-title { text-shadow: none; }
@@ -278,7 +277,7 @@
     }
 
     .meta-card {
-        background: rgba(10, 16, 32, 0.60);
+        background: rgba(20, 10, 24, 0.60);
         backdrop-filter: blur(12px);
         border: 1px solid var(--c-border);
         border-radius: 4px;
@@ -289,7 +288,7 @@
     }
 
     body.light-theme .meta-card {
-        background: rgba(255,255,255,0.75);
+        background: rgba(255,240,246,0.75);
         backdrop-filter: blur(12px);
     }
 
@@ -303,12 +302,12 @@
     }
     .meta-card:hover::before { opacity: 1; }
     .meta-card:hover {
-        background: rgba(64,200,255,0.07);
+        background: rgba(255,110,176,0.07);
         border-color: var(--c-cyan-20);
     }
 
     body.light-theme .meta-card:hover {
-        background: rgba(0,144,204,0.06);
+        background: rgba(214,58,128,0.06);
     }
 
     .meta-card-label {
@@ -362,7 +361,7 @@
     .genre-badge:hover {
         background: var(--c-cyan-20);
         border-color: var(--c-cyan);
-        box-shadow: 0 0 8px rgba(64,200,255,0.2);
+        box-shadow: 0 0 8px rgba(255,110,176,0.2);
     }
 
     /* ── ACTION BUTTONS ── */
@@ -400,7 +399,7 @@
         flex: 1;
         min-width: 180px;
         justify-content: center;
-        box-shadow: 0 0 20px rgba(64,200,255,0.15), inset 0 0 20px rgba(64,200,255,0.05);
+        box-shadow: 0 0 20px rgba(255,110,176,0.15), inset 0 0 20px rgba(255,110,176,0.05);
     }
 
     .btn-play::before {
@@ -413,7 +412,7 @@
     }
     .btn-play:hover::before { transform: scaleX(1); }
     .btn-play:hover {
-        box-shadow: 0 0 30px rgba(64,200,255,0.35), inset 0 0 25px rgba(64,200,255,0.1);
+        box-shadow: 0 0 30px rgba(255,110,176,0.35), inset 0 0 25px rgba(255,110,176,0.1);
         border-color: var(--c-cyan);
     }
     .btn-play span, .btn-play i { position: relative; z-index: 1; }
@@ -441,7 +440,7 @@
     .btn-download:hover {
         border-color: var(--c-cyan);
         color: var(--c-cyan);
-        box-shadow: 0 0 12px rgba(64,200,255,0.2);
+        box-shadow: 0 0 12px rgba(255,110,176,0.2);
     }
     .btn-bookmark span, .btn-bookmark i,
     .btn-download span, .btn-download i { position: relative; z-index: 1; }
@@ -472,21 +471,13 @@
         border-bottom: 1px solid var(--c-border);
     }
 
-    .section-accent {
-        width: 4px;
-        height: 1.75rem;
-        background: linear-gradient(to bottom, var(--c-cyan), var(--c-purple));
-        border-radius: 2px;
-        margin-right: 1rem;
-        box-shadow: 0 0 8px rgba(64,200,255,0.35);
-        flex-shrink: 0;
-    }
+    .section-accent { display: none; }
 
     .section-title {
-        font-family: var(--font-hud);
-        font-size: 1.35rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
+        font-family: var(--font-body);
+        font-size: 1.1rem;
+        font-weight: 900;
+        letter-spacing: 2px;
         text-transform: uppercase;
         color: var(--c-text);
         margin: 0;
@@ -553,7 +544,7 @@
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; height: 2px;
-        background: linear-gradient(90deg, var(--c-cyan), var(--c-purple));
+        background: var(--c-cyan);
         transform: scaleX(0);
         transition: transform 0.3s ease;
     }
@@ -561,7 +552,7 @@
 
     .episode-item:hover {
         border-color: var(--c-cyan);
-        box-shadow: 0 0 14px rgba(64,200,255,0.18);
+        box-shadow: 0 0 14px rgba(255,110,176,0.18);
     }
 
     .episode-number {
@@ -579,7 +570,7 @@
 
     .episode-number i {
         font-size: 0.85rem;
-        filter: drop-shadow(0 0 3px var(--c-cyan));
+        filter: drop-shadow(0 0 3px rgba(255,110,176,0.7));
     }
 
     .episode-date {
@@ -639,7 +630,7 @@
     .recommendation-item:hover {
         transform: translateY(-6px);
         border-color: var(--c-cyan);
-        box-shadow: 0 8px 28px rgba(64,200,255,0.2);
+        box-shadow: 0 8px 28px rgba(255,110,176,0.2);
     }
 
     .recommendation-poster {
@@ -895,7 +886,6 @@
             {% if anime.synopsis %}
             <div class="synopsis-section">
                 <div class="section-header">
-                    <div class="section-accent"></div>
                     <h2 class="section-title">Synopsis</h2>
                 </div>
                 <p class="synopsis-text">
@@ -917,7 +907,6 @@
             {% if anime.episodeList %}
             <div class="episodes-section">
                 <div class="section-header">
-                    <div class="section-accent"></div>
                     <h2 class="section-title">Episodes</h2>
                 </div>
                 <div class="episodes-grid">
@@ -933,11 +922,59 @@
             </div>
             {% endif %}
 
+
+            <!-- ============ KOMENTAR & RATING ============ -->
+            <div class="episodes-section" id="commentSection" style="margin-top:2rem;">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-comments" style="color:var(--c-cyan);margin-right:.5rem;font-size:1rem;"></i>Komentar & Rating</h2>
+                </div>
+
+                <!-- Form -->
+                <div style="margin-bottom:1.5rem;">
+                {% if session.get('user') %}
+                <div style="background:var(--c-card);border:1px solid var(--c-border);border-radius:6px;padding:1.25rem;">
+                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+                        <img src="{{ session.user.picture }}" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--c-border);" alt="">
+                        <span style="font-family:var(--font-hud);font-weight:600;font-size:.9rem;color:var(--c-text);">{{ session.user.name }}</span>
+                    </div>
+                    <div style="margin-bottom:.75rem;">
+                        <div style="font-family:var(--font-hud);font-size:.72rem;color:var(--c-text-dim);letter-spacing:.5px;margin-bottom:.4rem;">RATING (1-10)</div>
+                        <div id="starRating">
+                            {% for i in range(1,11) %}
+                            <span class="cmt-star" data-val="{{ i }}" onclick="setRating({{ i }})" style="cursor:pointer;font-size:1.4rem;color:var(--c-text-dim);transition:color .15s;">★</span>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" id="ratingInput" value="0">
+                    </div>
+                    <textarea id="commentInput" placeholder="Tulis komentar kamu tentang anime ini..." rows="3"
+                        style="width:100%;background:var(--c-elevated);border:1px solid var(--c-border);border-radius:4px;color:var(--c-text);font-family:var(--font-body);font-size:.9rem;padding:.75rem;resize:vertical;outline:none;box-sizing:border-box;transition:border-color .2s;"></textarea>
+                    <button onclick="submitComment()" style="margin-top:.75rem;padding:.55rem 1.25rem;background:linear-gradient(135deg,var(--c-cyan),var(--c-purple));border:none;border-radius:4px;color:#fff;font-family:var(--font-hud);font-weight:700;font-size:.85rem;letter-spacing:.5px;cursor:pointer;">
+                        <i class="fas fa-paper-plane"></i> KIRIM KOMENTAR
+                    </button>
+                </div>
+                {% else %}
+                <div style="background:var(--c-card);border:1px solid var(--c-border);border-radius:6px;padding:1.5rem;text-align:center;">
+                    <i class="fas fa-lock" style="color:var(--c-cyan);font-size:1.75rem;margin-bottom:.6rem;display:block;opacity:.7;"></i>
+                    <p style="color:var(--c-text-dim);font-family:var(--font-hud);margin:0 0 .875rem;letter-spacing:.3px;">Login untuk menulis komentar & memberi rating</p>
+                    <a href="/login" style="padding:.55rem 1.5rem;background:linear-gradient(135deg,var(--c-cyan),var(--c-purple));border-radius:4px;color:#fff;text-decoration:none;font-family:var(--font-hud);font-weight:700;font-size:.85rem;letter-spacing:.5px;">
+                        <i class="fas fa-sign-in-alt"></i> LOGIN
+                    </a>
+                </div>
+                {% endif %}
+                </div>
+
+                <!-- Daftar Komentar -->
+                <div id="commentList">
+                    <div style="text-align:center;color:var(--c-text-dim);padding:1.5rem;font-family:var(--font-hud);font-size:.8rem;letter-spacing:.5px;">
+                        <i class="fas fa-spinner fa-spin"></i> Memuat komentar...
+                    </div>
+                </div>
+            </div>
+
             <!-- Recommendations -->
             {% if anime.recommendedAnimeList %}
             <div class="recommendations-section">
                 <div class="section-header">
-                    <div class="section-accent"></div>
                     <h2 class="section-title">You Might Also Like</h2>
                 </div>
                 <div class="recommendations-grid">
@@ -986,9 +1023,93 @@ console.log('Anime Data loaded:', window.animeData);
 {% endif %}
 {% endblock %}
 
+
 {% block extra_js %}
 <!-- Load Bookmark System -->
 <script src="{{ url_for('static', filename='js/bookmark.js') }}"></script>
 <!-- Load Share System -->
 <script src="{{ url_for('static', filename='js/share-system.js') }}"></script>
+<script>
+// ============ RATING & KOMENTAR ============
+let selectedRating = 0;
+const ANIME_ID = window.animeData ? window.animeData.animeId : '{{ anime_id }}';
+const MY_SUB   = "{{ session.user.sub if session.get('user') else '' }}";
+
+function setRating(val) {
+    selectedRating = val;
+    document.getElementById('ratingInput').value = val;
+    document.querySelectorAll('.cmt-star').forEach((s, i) => {
+        s.style.color = i < val ? '#f5c518' : 'var(--c-text-dim)';
+    });
+}
+
+async function submitComment() {
+    const comment = document.getElementById('commentInput')?.value?.trim();
+    const rating  = parseInt(document.getElementById('ratingInput')?.value || 0);
+    if (!comment) { alert('Komentar tidak boleh kosong!'); return; }
+    const res = await fetch('/api/comments/' + ANIME_ID, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ comment, rating })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+        document.getElementById('commentInput').value = '';
+        setRating(0);
+        loadComments();
+    } else {
+        alert(data.message || 'Gagal mengirim komentar');
+    }
+}
+
+async function deleteMyComment() {
+    if (!confirm('Hapus komentar kamu?')) return;
+    await fetch('/api/comments/' + ANIME_ID + '/delete', { method: 'POST' });
+    loadComments();
+}
+
+async function loadComments() {
+    const list = document.getElementById('commentList');
+    if (!list) return;
+    const res  = await fetch('/api/comments/' + ANIME_ID);
+    const data = await res.json();
+    if (!data.data || data.data.length === 0) {
+        list.innerHTML = '<div style="text-align:center;color:var(--c-text-dim);padding:2rem;font-family:var(--font-hud);font-size:.8rem;letter-spacing:.5px;">Belum ada komentar. Jadilah yang pertama!</div>';
+        return;
+    }
+    list.innerHTML = data.data.map(c => {
+        const filled  = '★'.repeat(c.rating);
+        const empty   = '★'.repeat(10 - c.rating);
+        const isMe    = MY_SUB && c.user_sub === MY_SUB;
+        return `<div style="background:var(--c-card);border:1px solid var(--c-border);border-radius:6px;padding:1rem;margin-bottom:.75rem;">
+            <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.65rem;">
+                <img src="${c.user_pic}" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--c-border);"
+                     onerror="this.src=''" alt="">
+                <div style="flex:1;min-width:0;">
+                    <div style="font-family:var(--font-hud);font-weight:600;font-size:.85rem;color:var(--c-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.user_name}</div>
+                    <div style="font-size:.68rem;color:var(--c-text-dim);">${c.posted_at}</div>
+                </div>
+                ${c.rating ? `<div style="color:#f5c518;font-size:.8rem;letter-spacing:1px;flex-shrink:0;">${filled}<span style="color:var(--c-text-dim);opacity:.35;">${empty}</span> <span style="color:var(--c-text-dim);font-family:var(--font-hud);font-size:.72rem;">${c.rating}/10</span></div>` : ''}
+                ${isMe ? `<button onclick="deleteMyComment()" title="Hapus komentar" style="background:rgba(255,60,60,0.1);border:1px solid rgba(255,60,60,0.25);border-radius:4px;color:#ff6060;cursor:pointer;padding:.25rem .6rem;font-size:.72rem;flex-shrink:0;"><i class="fas fa-trash"></i></button>` : ''}
+            </div>
+            <p style="margin:0;font-size:.88rem;color:var(--c-text);line-height:1.6;">${c.comment}</p>
+        </div>`;
+    }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', loadComments);
+
+// Hover effect on stars
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.cmt-star');
+    stars.forEach((star, i) => {
+        star.addEventListener('mouseover', () => {
+            stars.forEach((s, j) => s.style.color = j <= i ? '#f5c518' : 'var(--c-text-dim)');
+        });
+        star.addEventListener('mouseleave', () => {
+            stars.forEach((s, j) => s.style.color = j < selectedRating ? '#f5c518' : 'var(--c-text-dim)');
+        });
+    });
+});
+</script>
 {% endblock %}

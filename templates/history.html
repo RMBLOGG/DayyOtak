@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Riwayat Tonton - DAYYdesu{% endblock %}
+
+{% block extra_css %}
+<style>
+.history-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 2rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--c-border);
+}
+
+.page-title {
+    font-family: var(--font-hud);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--c-text);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.page-title i { color: var(--c-cyan); }
+
+.clear-btn {
+    padding: 0.45rem 1rem;
+    background: rgba(255,60,60,0.08);
+    border: 1px solid rgba(255,60,60,0.25);
+    border-radius: 4px;
+    color: #ff6060;
+    font-family: var(--font-hud);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.clear-btn:hover {
+    background: rgba(255,60,60,0.18);
+    border-color: rgba(255,60,60,0.5);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--c-text);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.history-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--c-cyan), var(--c-purple));
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.history-item:hover {
+    border-color: var(--c-cyan-35);
+    background: var(--c-elevated);
+    transform: translateX(3px);
+}
+
+.history-item:hover::before { opacity: 1; }
+
+.history-poster {
+    width: 52px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: var(--c-elevated);
+    border: 1px solid var(--c-border);
+}
+
+.history-poster-placeholder {
+    width: 52px;
+    height: 72px;
+    background: var(--c-elevated);
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.history-poster-placeholder i {
+    color: var(--c-text-dim);
+    font-size: 1.2rem;
+}
+
+.history-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-anime-title {
+    font-family: var(--font-hud);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--c-cyan);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.25rem;
+}
+
+.history-ep-title {
+    font-size: 0.82rem;
+    color: var(--c-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.4rem;
+}
+
+.history-time {
+    font-family: var(--font-hud);
+    font-size: 0.68rem;
+    color: var(--c-text-dim);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.history-arrow {
+    color: var(--c-text-dim);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--c-text-dim);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--c-cyan);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-state p {
+    font-family: var(--font-hud);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.empty-state a {
+    color: var(--c-cyan);
+    text-decoration: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="history-container main-content">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-history"></i> Riwayat Tonton
+        </h1>
+        {% if history %}
+        <button class="clear-btn" onclick="clearHistory()">
+            <i class="fas fa-trash"></i> Hapus Semua
+        </button>
+        {% endif %}
+    </div>
+
+    {% if history %}
+    <div class="history-list" id="historyList">
+        {% for item in history %}
+        <a href="/episode/{{ item.episode_id }}" class="history-item">
+            {% if item.poster %}
+            <img src="{{ item.poster }}" alt="" class="history-poster" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="history-poster-placeholder" style="display:none"><i class="fas fa-film"></i></div>
+            {% else %}
+            <div class="history-poster-placeholder"><i class="fas fa-film"></i></div>
+            {% endif %}
+            <div class="history-info">
+                <div class="history-anime-title">{{ item.anime_title or 'Unknown Anime' }}</div>
+                <div class="history-ep-title">{{ item.episode_title or item.episode_id }}</div>
+                <div class="history-time">
+                    <i class="fas fa-clock"></i> {{ item.watched_at }}
+                </div>
+            </div>
+            <i class="fas fa-chevron-right history-arrow"></i>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-tv"></i>
+        <p>Belum ada riwayat tonton.<br><a href="/">Mulai nonton sekarang →</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function clearHistory() {
+    if (!confirm('Hapus semua riwayat tonton?')) return;
+    const res = await fetch('/api/history/clear', { method: 'POST' });
+    const data = await res.json();
+    if (data.status === 'success') {
+        document.getElementById('historyList')?.remove();
+        document.querySelector('.page-header button')?.remove();
+        document.querySelector('.history-container').insertAdjacentHTML('beforeend',
+            `<div class="empty-state"><i class="fas fa-tv"></i><p>Belum ada riwayat tonton.<br><a href="/">Mulai nonton sekarang →</a></p></div>`
+        );
+    }
+}
+</script>
+{% endblock %}

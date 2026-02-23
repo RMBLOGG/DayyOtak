@@ -5,15 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="pTKv7RdKpXBtLCnGaf4YM9U_aXpx4uzHnyL2mm3Kn3s" />
     <title>{% block title %}DayyDesu{% endblock %}</title>
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon.png') }}">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#060b16">
-    <!-- Favicon & PWA -->
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon.png') }}">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#060b16">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -122,19 +113,30 @@
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(64,200,255,0.35);
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 0 12px rgba(64,200,255,0.4);
-            flex-shrink: 0;
         }
 
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+        }
+
+        .logo-icon i {
+            color: #fff;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
         }
 
         .logo-title {
@@ -144,12 +146,6 @@
             letter-spacing: 1px;
             color: var(--c-text);
             line-height: 1;
-            white-space: nowrap;
-        }
-
-        /* Tampilkan title hanya jika layar cukup lebar */
-        @media (max-width: 360px) {
-            .logo-title { display: none; }
         }
 
         /* ── SEARCH ── */
@@ -260,14 +256,6 @@
         /* ── PAGE CONTENT ── */
         .content-wrapper {
             padding: 1.75rem 1rem;
-        }
-
-        /* Hero slider breakout - full width tanpa padding */
-        .hero-slider {
-            margin-left: -1rem;
-            margin-right: -1rem;
-            margin-top: -1.75rem;
-            width: calc(100% + 2rem);
         }
 
         /* ══════════════════════════════════════════
@@ -794,10 +782,10 @@
         }
 
         /* Support link */
-        .menu-item[href*="sociabuzz"] { color: #76CC11 !important; }
-        .menu-item[href*="sociabuzz"] i { color: #76CC11 !important; opacity: 1; }
-        .menu-item[href*="sociabuzz"]:hover { color: #8eee22 !important; }
-        .menu-item[href*="sociabuzz"]::before { background: linear-gradient(90deg, rgba(118,204,17,0.08), transparent); }
+        .menu-item[href*="sociabuzz"] { color: #ff9ed6 !important; }
+        .menu-item[href*="sociabuzz"] i { color: #ff9ed6 !important; opacity: 1; }
+        .menu-item[href*="sociabuzz"]:hover { color: #ffb7d5 !important; }
+        .menu-item[href*="sociabuzz"]::before { background: linear-gradient(90deg, rgba(64,200,255,0.08), transparent); }
         .menu-item[href*="sociabuzz"]::after { color: #76CC11; }
 
         /* ══════════════════════════════════════════
@@ -907,45 +895,93 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50%       { opacity: 0.4; transform: scale(0.7); }
         }
-        /* ══ SEARCH MODAL ══ */
-        .search-modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.75); z-index: 9999;
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            align-items: flex-start; justify-content: center; padding-top: 70px;
-        }
-        .search-modal-overlay.active { display: flex; }
-        .search-modal-box {
-            width: 92%; max-width: 500px;
-            background: var(--c-elevated); border: 1px solid var(--c-border);
-            border-radius: 12px; overflow: hidden;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.7), 0 0 24px rgba(64,200,255,0.1);
-            animation: smIn 0.2s ease;
-        }
-        @keyframes smIn {
-            from { opacity:0; transform: translateY(-20px) scale(0.96); }
-            to   { opacity:1; transform: translateY(0) scale(1); }
-        }
-        .sm-inner { display:flex; align-items:center; gap:0.75rem; padding:0.9rem 1rem; }
-        .sm-inner > i { color:var(--c-cyan); opacity:0.8; flex-shrink:0; }
-        .sm-inp {
-            flex:1; background:transparent; border:none; outline:none;
-            color:var(--c-text); font-family:var(--font-hud);
-            font-size:1.05rem; font-weight:500; letter-spacing:0.5px;
-        }
-        .sm-inp::placeholder { color:var(--c-text-dim); }
-        .sm-close { background:none; border:none; cursor:pointer; color:var(--c-text-dim); font-size:1rem; padding:4px 8px; border-radius:4px; }
-        .sm-close:hover { color:var(--c-cyan); }
-        .sm-divider { height:1px; background:var(--c-border); }
-        .sm-footer { padding:0.7rem 1rem; display:flex; justify-content:flex-end; }
-        .sm-btn {
-            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
-            color:#fff; border:none; border-radius:6px; padding:0.5rem 1.4rem;
-            font-family:var(--font-hud); font-size:0.9rem; font-weight:700;
-            letter-spacing:1px; cursor:pointer;
-        }
-        .sm-btn:hover { opacity:0.85; }
 
+        /* ══════════════════════════════════════════
+           USER AVATAR / LOGIN BUTTON
+        ══════════════════════════════════════════ */
+        .topbar-user { position: relative; flex-shrink: 0; }
+
+        /* Login Button */
+        .btn-login-topbar {
+            display: flex; align-items: center; gap: 0.4rem;
+            padding: 0.38rem 0.8rem;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            color: #fff;
+            border-radius: 6px;
+            font-family: var(--font-hud);
+            font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(64,200,255,0.3);
+            white-space: nowrap;
+        }
+        .btn-login-topbar:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(64,200,255,0.45); }
+        .btn-login-topbar i { font-size: 0.72rem; }
+
+        /* Avatar Button */
+        .user-avatar-btn {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 2px solid var(--c-cyan);
+            background: var(--c-cyan-20);
+            cursor: pointer; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 8px rgba(64,200,255,0.25);
+        }
+        .user-avatar-btn:hover {
+            border-color: var(--c-cyan);
+            box-shadow: 0 0 14px rgba(64,200,255,0.5);
+            transform: scale(1.06);
+        }
+        .user-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+        .user-avatar-fallback {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            color: #fff; font-family: var(--font-hud); font-size: 0.95rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Dropdown */
+        .user-dropdown {
+            position: absolute; top: calc(100% + 10px); right: 0;
+            min-width: 210px;
+            background: var(--c-elevated);
+            border: 1px solid var(--c-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+            overflow: hidden; z-index: 500;
+            opacity: 0; transform: translateY(-6px) scale(0.97);
+            pointer-events: none;
+            transition: all 0.18s ease;
+        }
+        .user-dropdown.open {
+            opacity: 1; transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+        .user-dropdown-header {
+            display: flex; align-items: center; gap: 0.7rem;
+            padding: 0.9rem 1rem;
+        }
+        .dropdown-avatar {
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 1.5px solid var(--c-border); object-fit: cover; flex-shrink: 0;
+        }
+        .dropdown-name { font-size: 0.875rem; font-weight: 600; color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dropdown-email { font-size: 0.7rem; color: var(--c-text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dropdown-divider { height: 1px; background: var(--c-border); }
+        .dropdown-item {
+            display: flex; align-items: center; gap: 0.6rem;
+            padding: 0.65rem 1rem;
+            font-size: 0.84rem; color: var(--c-text);
+            text-decoration: none; transition: background 0.15s;
+        }
+        .dropdown-item:hover { background: var(--c-cyan-08); color: var(--c-cyan); }
+        .dropdown-item i { width: 16px; font-size: 0.8rem; color: var(--c-cyan); opacity: 0.8; }
+        .dropdown-item.logout { color: #ff6b6b; }
+        .dropdown-item.logout:hover { background: rgba(255,107,107,0.08); }
+        .dropdown-item.logout i { color: #ff6b6b; }
     </style>
 </head>
 <body>
@@ -953,18 +989,53 @@
     <div class="main-content">
         <!-- Top Navigation Bar -->
         <header class="topbar">
-            <a href="/" class="topbar-logo">
+            <div class="topbar-logo">
                 <div class="logo-icon">
-                    <img src="{{ url_for('static', filename='img/favicon.png') }}" alt="DAYYdesu">
+                    <i class="fas fa-play"></i>
                 </div>
-                <span class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</span>
-            </a>
+                <div class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</div>
+            </div>
+            
+            <div class="search-wrapper">
+                <form action="/search" method="get" class="search-form" onsubmit="searchAnime(event)">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="q" class="search-input" placeholder="Cari anime..." required>
+                </form>
+            </div>
+            
+            <div class="topbar-actions">
+            </div>
 
-            <div style="flex:1;"></div>
-
-            <button onclick="openSearchModal()" style="width:40px;height:40px;flex-shrink:0;border-radius:8px;background:rgba(64,200,255,0.1);border:1px solid rgba(64,200,255,0.25);color:var(--c-cyan);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                <i class="fas fa-search"></i>
-            </button>
+            <!-- User Avatar / Login Button -->
+            <div class="topbar-user">
+                {% if session.get('user') %}
+                    <button class="user-avatar-btn" id="userAvatarBtn" title="{{ session['user']['name'] }}">
+                        <img src="{{ session['user']['picture'] }}" alt="{{ session['user']['name'] }}"
+                             class="user-avatar-img"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                        <span class="user-avatar-fallback" style="display:none;">{{ session['user']['name'][0].upper() }}</span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <img src="{{ session['user']['picture'] }}" alt="" class="dropdown-avatar" onerror="this.style.display='none'">
+                            <div>
+                                <div class="dropdown-name">{{ session['user']['name'] }}</div>
+                                <div class="dropdown-email">{{ session['user']['email'] }}</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profil Saya</a>
+                        <a href="/bookmarks" class="dropdown-item"><i class="fas fa-bookmark"></i> Bookmarks</a>
+                        <a href="/history" class="dropdown-item"><i class="fas fa-history"></i> Riwayat Tonton</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="/logout" class="dropdown-item logout"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+                    </div>
+                {% else %}
+                    <a href="/login" class="btn-login-topbar">
+                        <i class="fas fa-user"></i><span>Login</span>
+                    </a>
+                {% endif %}
+            </div>
         </header>
         
         <!-- Page Content -->
@@ -1008,7 +1079,7 @@
                 <div class="menu-modal-header">
                     <div class="logo">
                         <div class="logo-icon">
-                            <img src="{{ url_for('static', filename='img/favicon.png') }}" alt="DAYYdesu" style="width:100%;height:100%;object-fit:cover;border-radius:6px;display:block;">
+                            <i class="fas fa-play"></i>
                         </div>
                         <div class="logo-text">
                             <div class="logo-title">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</div>
@@ -1018,6 +1089,28 @@
                     <button class="menu-close" id="menuClose">
                         <i class="fas fa-times"></i>
                     </button>
+                </div>
+
+                <!-- User Info di Menu -->
+                <div style="padding:0.85rem 1.25rem; border-bottom:1px solid var(--c-border);">
+                    {% if session.get('user') %}
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        <img src="{{ session['user']['picture'] }}" alt=""
+                             style="width:42px;height:42px;border-radius:50%;border:2px solid var(--c-cyan);object-fit:cover;"
+                             onerror="this.style.display='none'">
+                        <div style="min-width:0;">
+                            <div style="font-size:0.875rem;font-weight:600;color:var(--c-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ session['user']['name'] }}</div>
+                            <div style="font-size:0.7rem;color:var(--c-text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ session['user']['email'] }}</div>
+                        </div>
+                        <a href="/logout" style="margin-left:auto;padding:0.35rem 0.75rem;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);border-radius:6px;color:#ff6b6b;font-size:0.72rem;font-family:var(--font-hud);text-decoration:none;white-space:nowrap;">
+                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        </a>
+                    </div>
+                    {% else %}
+                    <a href="/login" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.7rem;background:linear-gradient(135deg,var(--c-cyan),var(--c-purple));color:#fff;border-radius:8px;text-decoration:none;font-family:var(--font-hud);font-size:0.85rem;font-weight:600;letter-spacing:0.5px;box-shadow:0 2px 12px rgba(64,200,255,0.35);">
+                        <i class="fas fa-user"></i> Login dengan Google
+                    </a>
+                    {% endif %}
                 </div>
 
                 <!-- Body -->
@@ -1141,35 +1234,6 @@
         </div>
     </div> -->
     
-    <!-- Search Modal -->
-    <div class="search-modal-overlay" id="searchModalOverlay" onclick="if(event.target===this)closeSearchModal()">
-        <div class="search-modal-box">
-            <div class="sm-inner">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchModalInput" class="sm-inp" placeholder="Cari anime..."
-                    onkeydown="if(event.key==='Enter')submitSearch();if(event.key==='Escape')closeSearchModal()">
-                <button class="sm-close" onclick="closeSearchModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="sm-divider"></div>
-            <div class="sm-footer">
-                <button class="sm-btn" onclick="submitSearch()">CARI</button>
-            </div>
-        </div>
-    </div>
-    <script>
-        function openSearchModal(){
-            document.getElementById('searchModalOverlay').classList.add('active');
-            setTimeout(function(){ document.getElementById('searchModalInput').focus(); },80);
-        }
-        function closeSearchModal(){
-            document.getElementById('searchModalOverlay').classList.remove('active');
-        }
-        function submitSearch(){
-            var v=document.getElementById('searchModalInput').value.trim();
-            if(v) window.location.href='/search?q='+encodeURIComponent(v);
-        }
-    </script>
-
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
         // Theme Toggle Function
@@ -1278,7 +1342,7 @@
     </script>
 
     {% block extra_js %}{% endblock %}
-    <!-- <script src="https://pl28641133.effectivegatecpm.com/8b/96/a4/8b96a43c98aecec93f1d8bf33003a4fc.js"></script> -->
+    <script src="https://pl28641133.effectivegatecpm.com/8b/96/a4/8b96a43c98aecec93f1d8bf33003a4fc.js"></script>
     <script src="https://pl28657674.effectivegatecpm.com/8e/73/23/8e73236a6460c851945d5d5649c0fb70.js"></script>
     <script type="text/javascript" src="https://storage.sociabuzz.com/storage/js/main/buttononwebsite/index.min.js"></script>
     <script>sbBoW.draw("dayynime","QmVyaSBEdWt1bmdhbg","position-bottom-right","#010076c4","#ffffff")</script>
@@ -1321,6 +1385,19 @@
             if (menuModal)   menuModal.classList.remove('active');
             if (menuOverlay) menuOverlay.classList.remove('active');
             document.body.style.overflow = '';
+        })();
+        // ── User Dropdown ──
+        (function() {
+            var btn      = document.getElementById('userAvatarBtn');
+            var dropdown = document.getElementById('userDropdown');
+            if (!btn || !dropdown) return;
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
+            document.addEventListener('click', function() {
+                dropdown.classList.remove('open');
+            });
         })();
     </script>
 </body>
