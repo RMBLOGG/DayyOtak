@@ -492,7 +492,8 @@ body.light-theme .menu-modal {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    display: none;
+    display: block;
+    white-space: nowrap;
 }
 
 @media (min-width: 480px) {
