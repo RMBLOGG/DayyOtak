@@ -634,6 +634,76 @@ def profile_page():
     }
     return render_template('profile.html', user=user, history=history[:6], my_comments=my_comments, stats=stats)
 
+# ============ LIVE CHAT ============
+@app.route('/chat')
+@login_required
+def chat_page():
+    user = session.get('user')
+    return render_template('chat.html', user=user)
+
+@app.route('/api/chat', methods=['GET'])
+@login_required
+def api_get_chat():
+    if not supabase:
+        return jsonify({'status': 'error', 'message': 'Supabase not configured'}), 503
+
+    after = request.args.get('after', 0, type=int)
+    limit = request.args.get('limit', 50, type=int)
+
+    try:
+        query = supabase.table('live_chat').select('*').order('id', desc=False)
+        if after:
+            query = query.gt('id', after)
+        query = query.limit(limit)
+        res = query.execute()
+        return jsonify({'status': 'success', 'data': res.data or []})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/chat', methods=['POST'])
+@login_required
+def api_post_chat():
+    if not supabase:
+        return jsonify({'status': 'error', 'message': 'Supabase not configured'}), 503
+
+    user = session.get('user')
+    body = request.get_json() or {}
+    message = body.get('message', '').strip()
+
+    if not message:
+        return jsonify({'status': 'error', 'message': 'Pesan tidak boleh kosong'}), 400
+
+    # Batasi panjang pesan
+    message = message[:500]
+
+    try:
+        supabase.table('live_chat').insert({
+            'user_sub':  user.get('sub'),
+            'user_name': user.get('name'),
+            'user_pic':  user.get('picture'),
+            'message':   message,
+            'posted_at': datetime.now().isoformat()
+        }).execute()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/chat/delete/<int:msg_id>', methods=['POST'])
+@login_required
+def api_delete_chat(msg_id):
+    """User hanya bisa hapus pesan sendiri."""
+    if not supabase:
+        return jsonify({'status': 'error', 'message': 'Supabase not configured'}), 503
+
+    user = session.get('user')
+    try:
+        supabase.table('live_chat').delete()\
+            .eq('id', msg_id).eq('user_sub', user.get('sub')).execute()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 # ============ ERROR HANDLERS ============
 @app.errorhandler(404)
 def not_found(e):
