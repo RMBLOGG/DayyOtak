@@ -677,11 +677,15 @@ def api_post_chat():
     message = message[:500]
 
     try:
+        import json as _json
+        anime_data_raw = body.get('anime_data')
         supabase.table('live_chat').insert({
             'user_sub':       user.get('sub'),
             'user_name':      user.get('name'),
             'user_pic':       user.get('picture'),
             'message':        message,
+            'msg_type':       body.get('msg_type', 'text'),
+            'anime_data':     anime_data_raw if anime_data_raw else None,
             'reply_to_id':    body.get('reply_to_id'),
             'reply_to_sub':   body.get('reply_to_sub', ''),
             'reply_to_name':  body.get('reply_to_name', ''),
