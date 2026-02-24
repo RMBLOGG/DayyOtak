@@ -678,11 +678,15 @@ def api_post_chat():
 
     try:
         supabase.table('live_chat').insert({
-            'user_sub':  user.get('sub'),
-            'user_name': user.get('name'),
-            'user_pic':  user.get('picture'),
-            'message':   message,
-            'posted_at': datetime.now().isoformat()
+            'user_sub':       user.get('sub'),
+            'user_name':      user.get('name'),
+            'user_pic':       user.get('picture'),
+            'message':        message,
+            'reply_to_id':    body.get('reply_to_id'),
+            'reply_to_sub':   body.get('reply_to_sub', ''),
+            'reply_to_name':  body.get('reply_to_name', ''),
+            'reply_to_msg':   body.get('reply_to_msg', '')[:200] if body.get('reply_to_msg') else None,
+            'posted_at':      datetime.now().isoformat()
         }).execute()
         return jsonify({'status': 'success'})
     except Exception as e:
