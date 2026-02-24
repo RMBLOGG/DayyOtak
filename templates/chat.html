@@ -479,5 +479,21 @@
     }
 
     init();
+
+    // Sembunyikan tombol SociaBuzz di halaman chat
+    function hideSociabuzzChat() {
+        document.querySelectorAll('body > *').forEach(function(el) {
+            if (el.tagName === 'SCRIPT' || el.classList.contains('chat-wrap') ||
+                el.classList.contains('bottom-nav') || el.classList.contains('menu-modal') ||
+                el.classList.contains('menu-overlay') || el.classList.contains('main-content')) return;
+            var cs = window.getComputedStyle(el);
+            if (cs.position !== 'fixed') return;
+            var rect = el.getBoundingClientRect();
+            if (rect.width < 300 && rect.height < 120) {
+                el.style.setProperty('display', 'none', 'important');
+            }
+        });
+    }
+    [300, 800, 1500, 3000].forEach(function(t) { setTimeout(hideSociabuzzChat, t); });
 </script>
 {% endblock %}
