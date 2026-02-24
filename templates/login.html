@@ -5,6 +5,7 @@
 <style>
 /* ── Login Page ── */
 .login-page {
+    text-align: center;
     min-height: calc(100vh - 56px);
     display: flex;
     align-items: center;
@@ -28,23 +29,7 @@
     to { transform: translateY(110vh) rotate(180deg); }
 }
 
-.login-card {
-    position: relative;
-    z-index: 1;
-    background: var(--c-card);
-    border: 1px solid var(--c-border);
-    border-radius: 20px;
-    padding: 2.5rem 1.75rem 2rem;
-    width: 100%;
-    max-width: 360px;
-    box-shadow: 0 12px 48px rgba(0,0,0,0.5), 0 0 0 1px var(--c-border), 0 0 40px rgba(64,200,255,0.05);
-    text-align: center;
-    animation: slide-up 0.4s cubic-bezier(0.16,1,0.3,1);
-}
-
-@keyframes slide-up {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
+to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Brand */
@@ -58,13 +43,14 @@
 
 .login-brand-icon {
     width: 50px; height: 50px;
+    background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 24px rgba(64,200,255,0.45);
     flex-shrink: 0;
 }
 
-.login-brand-icon img {
-    width: 100%; height: 100%;
-    object-fit: contain;
-}
+.login-brand-icon i { color: #fff; font-size: 1.4rem; }
 
 .login-brand-name {
     font-family: var(--font-hud);
@@ -184,24 +170,7 @@
 }
 
 /* Cyan glow top border */
-.login-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 10%; right: 10%; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--c-cyan), transparent);
-    box-shadow: 0 0 12px rgba(64,200,255,0.5);
-    border-radius: 20px 20px 0 0;
-}
-
 /* Purple glow bottom border */
-.login-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 20%; right: 20%; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--c-purple), transparent);
-    box-shadow: 0 0 8px rgba(136,85,255,0.3);
-    border-radius: 0 0 20px 20px;
-}
 </style>
 {% endblock %}
 
@@ -218,12 +187,11 @@
 {% endfor %}
 
 <div class="login-page">
-    <div class="login-card">
 
         <!-- Brand -->
         <div class="login-brand">
             <div class="login-brand-icon">
-                <img src="{{ url_for('static', filename='img/favicon.png') }}" alt="DAYYdesu">
+                <i class="fas fa-play"></i>
             </div>
             <span class="login-brand-name">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</span>
         </div>
@@ -260,6 +228,5 @@
 
         <a href="{{ url_for('index') }}" class="btn-skip">Lanjutkan tanpa login →</a>
 
-    </div>
 </div>
 {% endblock %}
