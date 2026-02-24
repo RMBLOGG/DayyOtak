@@ -58,14 +58,13 @@
 
 .login-brand-icon {
     width: 50px; height: 50px;
-    background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 24px rgba(64,200,255,0.45);
     flex-shrink: 0;
 }
 
-.login-brand-icon i { color: #fff; font-size: 1.4rem; }
+.login-brand-icon img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+}
 
 .login-brand-name {
     font-family: var(--font-hud);
@@ -224,7 +223,7 @@
         <!-- Brand -->
         <div class="login-brand">
             <div class="login-brand-icon">
-                <i class="fas fa-play"></i>
+                <img src="{{ url_for('static', filename='img/favicon.png') }}" alt="DAYYdesu">
             </div>
             <span class="login-brand-name">𝘿𝘼𝙔𝙔𝙙𝙚𝙨𝙪</span>
         </div>
