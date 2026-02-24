@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Home - DAYYdesu{% endblock %}
+{% block title %}DAYYdesu - Nonton Anime Sub Indonesia{% endblock %}
 
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -304,7 +304,7 @@
     /* ── ANIME CARD — cyber style ── */
     .anime-card {
         background: var(--c-card);
-        border-radius: 4px;
+        border-radius: 12px;
         overflow: hidden;
         transition: all 0.3s ease;
         cursor: pointer;
@@ -533,7 +533,7 @@
 {% block content %}
 {% if data and data.status == 'success' %}
     <!-- Hero Slider Section -->
-    <section class="hero-slider">
+    <section class="hero-slider hero-breakout">
         <div class="slider-wrapper">
             {% set featured_anime = data.data.ongoing.animeList[:5] %}
             {% for anime in featured_anime %}

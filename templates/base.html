@@ -258,6 +258,16 @@
             padding: 1.75rem 1rem;
         }
 
+        /* ── HERO BREAKOUT: keluar dari padding content-wrapper ── */
+        /* Tambahkan class ini ke elemen di dalam content-wrapper    */
+        /* agar bisa full-width melewati padding kiri-kanan & atas  */
+        .hero-breakout {
+            margin-top: -1.75rem;   /* breakout padding-top */
+            margin-left: -1rem;     /* breakout padding-left */
+            margin-right: -1rem;    /* breakout padding-right */
+            width: calc(100% + 2rem);
+        }
+
         /* ══════════════════════════════════════════
            BOTTOM NAVIGATION
         ══════════════════════════════════════════ */
