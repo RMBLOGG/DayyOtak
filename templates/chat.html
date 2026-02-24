@@ -393,6 +393,61 @@
     .msg.me  .msg-swipe-icon { right: -28px; }
     .msg.other .msg-swipe-icon { left: -28px; }
 
+    /* ── Context menu (long press) ── */
+    .ctx-menu {
+        position: fixed;
+        z-index: 999;
+        background: var(--c-elevated);
+        border: 1px solid var(--c-border);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--c-cyan-12);
+        min-width: 160px;
+        animation: ctxIn .15s cubic-bezier(.16,1,.3,1);
+        transform-origin: top center;
+    }
+    @keyframes ctxIn {
+        from { opacity:0; transform:scale(0.9) translateY(-4px); }
+        to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+    .ctx-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.7rem 1rem;
+        font-family: var(--font-hud);
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: var(--c-text);
+        cursor: pointer;
+        transition: background .15s;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+    }
+    .ctx-item i { font-size: 0.8rem; width: 16px; color: var(--c-cyan); }
+    .ctx-item:hover { background: var(--c-cyan-08); }
+    .ctx-item + .ctx-item { border-top: 1px solid var(--c-border); }
+    .ctx-item.danger { color: #ef4444; }
+    .ctx-item.danger i { color: #ef4444; }
+    .ctx-item.danger:hover { background: rgba(239,68,68,0.08); }
+
+    /* Highlight bubble saat ctx menu aktif */
+    .msg-bubble.ctx-active {
+        border-color: var(--c-cyan-35) !important;
+        box-shadow: 0 0 16px rgba(64,200,255,0.2) !important;
+    }
+
+    /* Dim overlay saat ctx menu terbuka */
+    .ctx-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        z-index: 998;
+    }
+    .ctx-overlay.show { display: block; }
+
     /* Light theme */
     body.light-theme .chat-topbar      { background: var(--c-elevated); }
     body.light-theme .msg-bubble       { background: var(--c-card); }
@@ -424,6 +479,17 @@
         </div>
     </div>
 
+    <!-- Context Menu Overlay -->
+    <div class="ctx-overlay" id="ctxOverlay" onclick="closeCtx()"></div>
+    <div class="ctx-menu" id="ctxMenu" style="display:none;">
+        <button class="ctx-item" id="ctxReplyBtn" onclick="ctxReply()">
+            <i class="fas fa-reply"></i> Balas
+        </button>
+        <button class="ctx-item danger" id="ctxDeleteBtn" onclick="ctxDelete()">
+            <i class="fas fa-trash"></i> Hapus Pesan
+        </button>
+    </div>
+
     <!-- Reply Preview -->
     <div class="reply-preview" id="replyPreview">
         <div class="reply-preview-text">
@@ -453,6 +519,69 @@
     let lastId    = 0;
     let isSending = false;
     let replyTo   = null; // { id, user_name, message }
+    let ctxTarget = null; // pesan yang sedang di-long press
+
+    /* ── Context Menu ── */
+    function openCtx(e, m, el) {
+        ctxTarget = { m, el };
+        const menu    = document.getElementById('ctxMenu');
+        const overlay = document.getElementById('ctxOverlay');
+        const delBtn  = document.getElementById('ctxDeleteBtn');
+
+        // Tombol hapus hanya muncul untuk pesan sendiri
+        delBtn.style.display = m.user_sub === ME.sub ? 'flex' : 'none';
+
+        menu.style.display = 'block';
+        overlay.classList.add('show');
+
+        // Posisi menu — pastikan tidak keluar layar
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const mx = Math.min(e.clientX || e.touches?.[0]?.clientX || vw/2, vw - 170);
+        const my = Math.min(e.clientY || e.touches?.[0]?.clientY || vh/2, vh - 120);
+        menu.style.left = mx + 'px';
+        menu.style.top  = my + 'px';
+
+        // Sedikit highlight bubble
+        el.querySelector('.msg-bubble')?.classList.add('ctx-active');
+        if (navigator.vibrate) navigator.vibrate(40);
+    }
+    function closeCtx() {
+        const menu    = document.getElementById('ctxMenu');
+        const overlay = document.getElementById('ctxOverlay');
+        menu.style.display = 'none';
+        overlay.classList.remove('show');
+        if (ctxTarget) {
+            ctxTarget.el.querySelector('.msg-bubble')?.classList.remove('ctx-active');
+        }
+        ctxTarget = null;
+    }
+    function ctxReply() {
+        if (!ctxTarget) return;
+        closeCtx();
+        setReply(ctxTarget.m);
+    }
+    async function ctxDelete() {
+        if (!ctxTarget) return;
+        const { m, el } = ctxTarget;
+        closeCtx();
+        // Animasi hapus
+        el.style.transition = 'opacity .25s, transform .25s';
+        el.style.opacity = '0';
+        el.style.transform = 'scale(0.92)';
+        try {
+            const res  = await fetch(`/api/chat/delete/${m.id}`, { method: 'POST' });
+            const json = await res.json();
+            if (json.status === 'success') {
+                setTimeout(() => el.remove(), 250);
+            } else {
+                el.style.opacity = '1'; el.style.transform = '';
+                alert('Gagal menghapus pesan.');
+            }
+        } catch(e) {
+            el.style.opacity = '1'; el.style.transform = '';
+            console.warn(e);
+        }
+    }
 
     function esc(s) {
         return String(s)
@@ -516,6 +645,7 @@
             </div>`;
 
         attachSwipe(div, m);
+        attachLongPress(div, m);
         return div;
     }
 
@@ -571,6 +701,31 @@
         el.addEventListener('mousemove',  onMove);
         el.addEventListener('mouseup',    onEnd);
         el.addEventListener('mouseleave', onEnd);
+    }
+
+    /* ── Long Press to show context menu ── */
+    function attachLongPress(el, m) {
+        let timer = null;
+        const HOLD = 500; // ms
+
+        function start(e) {
+            timer = setTimeout(() => {
+                timer = null;
+                openCtx(e, m, el);
+            }, HOLD);
+        }
+        function cancel() {
+            if (timer) { clearTimeout(timer); timer = null; }
+        }
+
+        el.addEventListener('touchstart',  start,  {passive:true});
+        el.addEventListener('touchend',    cancel);
+        el.addEventListener('touchmove',   cancel);
+        el.addEventListener('mousedown',   start);
+        el.addEventListener('mouseup',     cancel);
+        el.addEventListener('mouseleave',  cancel);
+        // Prevent context menu default on mobile
+        el.addEventListener('contextmenu', e => { e.preventDefault(); openCtx(e, m, el); });
     }
 
     async function fetchNew() {
