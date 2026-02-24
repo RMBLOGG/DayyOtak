@@ -273,6 +273,25 @@
         box-shadow: 0 0 0 2px rgba(64,200,255,0.1), 0 0 16px rgba(64,200,255,0.08);
     }
 
+    .chat-share-btn {
+        width: 42px; height: 42px; flex-shrink: 0;
+        background: var(--c-cyan-08);
+        border: 1px solid var(--c-border);
+        border-radius: 6px;
+        color: var(--c-cyan);
+        font-size: 0.9rem;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: all .22s ease;
+        opacity: 0.7;
+    }
+    .chat-share-btn:hover {
+        background: var(--c-cyan-12);
+        border-color: var(--c-cyan);
+        opacity: 1;
+        box-shadow: 0 0 12px rgba(64,200,255,0.2);
+    }
+
     .chat-send-btn {
         width: 42px; height: 42px; flex-shrink: 0;
         background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
@@ -516,6 +535,209 @@
     }
     .reaction-badge.mine .r-count { color: var(--c-cyan); }
 
+    /* ── Anime share card di chat ── */
+    .msg-anime-card {
+        display: flex;
+        gap: 0.7rem;
+        background: var(--c-card);
+        border: 1px solid var(--c-border);
+        border-radius: 10px;
+        overflow: hidden;
+        text-decoration: none;
+        transition: border-color .2s, box-shadow .2s;
+        max-width: 260px;
+        cursor: pointer;
+        position: relative;
+    }
+    .msg-anime-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--c-cyan), var(--c-purple));
+    }
+    .msg-anime-card:hover {
+        border-color: var(--c-cyan-35);
+        box-shadow: 0 0 18px rgba(64,200,255,0.15);
+    }
+    .msg-anime-card .ac-poster {
+        width: 64px;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .msg-anime-card .ac-poster img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .msg-anime-card .ac-info {
+        padding: 0.55rem 0.6rem 0.55rem 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.25rem;
+        min-width: 0;
+    }
+    .msg-anime-card .ac-label {
+        font-family: var(--font-hud);
+        font-size: 0.56rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--c-cyan);
+        opacity: 0.7;
+    }
+    .msg-anime-card .ac-title {
+        font-family: var(--font-hud);
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--c-text);
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .msg-anime-card .ac-meta {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+    .msg-anime-card .ac-tag {
+        font-family: var(--font-hud);
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: var(--c-text-dim);
+        background: var(--c-cyan-08);
+        border: 1px solid var(--c-border);
+        border-radius: 3px;
+        padding: 1px 6px;
+    }
+    .msg-anime-card .ac-tag.score { color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.07); }
+
+    /* Share modal */
+    .share-modal-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(3,6,14,0.82);
+        backdrop-filter: blur(6px);
+        z-index: 500;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 58px;
+    }
+    .share-modal-overlay.show { display: flex; }
+    .share-modal {
+        background: linear-gradient(180deg, #0a1020 0%, #070d1c 100%);
+        border: 1px solid var(--c-border);
+        border-radius: 20px 20px 0 0;
+        width: 100%; max-width: 480px;
+        max-height: 70vh;
+        display: flex; flex-direction: column;
+        animation: slideUpModal .3s cubic-bezier(.32,.72,0,1);
+        position: relative; overflow: hidden;
+    }
+    @keyframes slideUpModal { from{transform:translateY(100%)} to{transform:translateY(0)} }
+    .share-modal::before {
+        content: '';
+        position: absolute; top:0; left:10%; right:10%; height:1px;
+        background: linear-gradient(90deg, transparent, var(--c-cyan), transparent);
+        box-shadow: 0 0 12px rgba(64,200,255,0.4);
+    }
+    .share-modal-handle {
+        width: 36px; height: 3px;
+        background: var(--c-border);
+        border-radius: 99px;
+        margin: 10px auto 0;
+        flex-shrink: 0;
+    }
+    .share-modal-header {
+        padding: 0.75rem 1.25rem 0.6rem;
+        border-bottom: 1px solid var(--c-border);
+        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .share-modal-title {
+        font-family: var(--font-hud);
+        font-size: 0.9rem; font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--c-text);
+    }
+    .share-modal-close {
+        width: 28px; height: 28px;
+        background: var(--c-cyan-08);
+        border: 1px solid var(--c-border);
+        border-radius: 4px;
+        color: var(--c-text-dim);
+        font-size: 0.75rem;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+    }
+    .share-modal-list {
+        overflow-y: auto; flex: 1;
+        padding: 0.75rem;
+        display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .share-bm-item {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        background: var(--c-cyan-08);
+        border: 1px solid var(--c-border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all .2s;
+    }
+    .share-bm-item:hover, .share-bm-item:active {
+        border-color: var(--c-cyan);
+        background: var(--c-cyan-12);
+        box-shadow: 0 0 12px rgba(64,200,255,0.15);
+    }
+    .share-bm-poster {
+        width: 40px; height: 54px;
+        border-radius: 4px;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 1px solid var(--c-border);
+    }
+    .share-bm-poster-placeholder {
+        width: 40px; height: 54px;
+        border-radius: 4px;
+        background: var(--c-elevated);
+        border: 1px solid var(--c-border);
+        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--c-text-dim); font-size: 1.2rem;
+    }
+    .share-bm-info { flex: 1; min-width: 0; }
+    .share-bm-title {
+        font-family: var(--font-hud);
+        font-size: 0.85rem; font-weight: 700;
+        color: var(--c-text);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .share-bm-meta {
+        font-family: var(--font-hud);
+        font-size: 0.65rem; color: var(--c-text-dim);
+        margin-top: 2px;
+    }
+    .share-bm-btn {
+        flex-shrink: 0;
+        width: 32px; height: 32px;
+        background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+        border: none; border-radius: 6px;
+        color: #fff; font-size: 0.8rem;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(64,200,255,0.3);
+    }
+    .share-empty {
+        text-align: center; padding: 2rem;
+        font-family: var(--font-hud);
+        font-size: 0.8rem; color: var(--c-text-dim);
+    }
+    .share-empty i { font-size: 2rem; color: var(--c-cyan); opacity: .2; display:block; margin-bottom:.75rem; }
+
     /* Light theme */
     body.light-theme .chat-topbar      { background: var(--c-elevated); }
     body.light-theme .msg-bubble       { background: var(--c-card); }
@@ -580,8 +802,25 @@
         <button class="reply-cancel" onclick="cancelReply()"><i class="fas fa-times"></i></button>
     </div>
 
+    <!-- Share Bookmark Modal -->
+    <div class="share-modal-overlay" id="shareModalOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal" id="shareModal">
+            <div class="share-modal-handle"></div>
+            <div class="share-modal-header">
+                <span class="share-modal-title"><i class="fas fa-bookmark" style="color:var(--c-cyan);margin-right:.5rem;"></i>Share Anime ke Chat</span>
+                <button class="share-modal-close" onclick="closeShareModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="share-modal-list" id="shareModalList">
+                <div class="share-empty"><i class="fas fa-bookmark"></i>Memuat bookmark...</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Input -->
     <div class="chat-input-area">
+        <button class="chat-share-btn" id="chatShareBtn" onclick="openShareModal()" title="Share anime">
+            <i class="fas fa-bookmark"></i>
+        </button>
         <textarea id="chatInput" class="chat-textarea"
                   placeholder="Ketik pesan..."
                   maxlength="500" rows="1"></textarea>
@@ -815,10 +1054,37 @@
                 </div>`;
         }
 
+        // Anime card jika tipe share
+        let bubbleInner = '';
+        if (m.msg_type === 'anime_share' && m.anime_data) {
+            const a = m.anime_data;
+            bubbleInner = `
+                ${quoteHtml}
+                <div style="font-size:.75rem;color:var(--c-text-dim);margin-bottom:.4rem;font-family:var(--font-hud);">
+                    <i class="fas fa-share-alt" style="color:var(--c-cyan);margin-right:.3rem;"></i>Rekomendasiin anime
+                </div>
+                <a href="/anime/${esc(a.animeId)}" class="msg-anime-card">
+                    <div class="ac-poster">
+                        ${a.poster ? `<img src="${esc(a.poster)}" alt="${esc(a.title)}" loading="lazy">` : '<div style="width:64px;height:90px;background:var(--c-elevated);display:flex;align-items:center;justify-content:center;color:var(--c-text-dim)"><i class="fas fa-image"></i></div>'}
+                    </div>
+                    <div class="ac-info">
+                        <div class="ac-label">Anime</div>
+                        <div class="ac-title">${esc(a.title)}</div>
+                        <div class="ac-meta">
+                            ${a.score ? `<span class="ac-tag score"><i class="fas fa-star"></i> ${esc(String(a.score))}</span>` : ''}
+                            ${a.type  ? `<span class="ac-tag">${esc(a.type)}</span>` : ''}
+                            ${a.status ? `<span class="ac-tag">${esc(a.status)}</span>` : ''}
+                        </div>
+                    </div>
+                </a>`;
+        } else {
+            bubbleInner = quoteHtml + esc(m.message);
+        }
+
         const div = document.createElement('div');
         div.className = `msg ${isMe ? 'me' : 'other'}`;
         div.dataset.id = m.id;
-        div.dataset.msg = m.message;
+        div.dataset.msg = m.msg_type === 'anime_share' ? `[Anime] ${m.anime_data?.title || ''}` : m.message;
         div.dataset.name = m.user_name || 'User';
         div.dataset.sub = m.user_sub;
         div.innerHTML = `
@@ -826,10 +1092,7 @@
             ${avatarHtml}
             <div class="msg-group">
                 <div class="msg-sender">${isMe ? 'Kamu' : esc(m.user_name || 'User')}</div>
-                <div class="msg-bubble">
-                    ${quoteHtml}
-                    ${esc(m.message)}
-                </div>
+                <div class="msg-bubble">${bubbleInner}</div>
                 <div class="msg-time">${fmtTime(m.posted_at)}</div>
             </div>`;
 
@@ -1013,6 +1276,79 @@
             hint.textContent = ''; hint.className = 'char-hint';
         }
     });
+
+    /* ── Share Bookmark Modal ── */
+    async function openShareModal() {
+        const overlay = document.getElementById('shareModalOverlay');
+        const list    = document.getElementById('shareModalList');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+
+        list.innerHTML = '<div class="share-empty"><i class="fas fa-circle-notch fa-spin"></i>Memuat bookmark...</div>';
+
+        try {
+            // Pakai API bookmark yang sudah ada
+            const res  = await fetch('/api/bookmarks');
+            const json = await res.json();
+            const bms  = json.data || [];
+
+            if (!bms.length) {
+                list.innerHTML = '<div class="share-empty"><i class="fas fa-bookmark"></i>Belum ada bookmark.<br>Tambah dulu dari halaman anime!</div>';
+                return;
+            }
+
+            list.innerHTML = bms.map(b => `
+                <div class="share-bm-item" onclick="shareAnime(${JSON.stringify({
+                    animeId: b.anime_id,
+                    title:   b.anime_title,
+                    poster:  b.poster,
+                    score:   b.score  || '',
+                    type:    b.type   || '',
+                    status:  b.status || ''
+                }).replace(/"/g,'&quot;')})">
+                    ${b.poster
+                        ? `<img src="${b.poster}" class="share-bm-poster" alt="" loading="lazy">`
+                        : `<div class="share-bm-poster-placeholder"><i class="fas fa-image"></i></div>`}
+                    <div class="share-bm-info">
+                        <div class="share-bm-title">${b.anime_title || 'Untitled'}</div>
+                        <div class="share-bm-meta">${[b.type, b.status, b.score ? '⭐ '+b.score : ''].filter(Boolean).join(' · ')}</div>
+                    </div>
+                    <button class="share-bm-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>`).join('');
+        } catch(e) {
+            list.innerHTML = '<div class="share-empty"><i class="fas fa-exclamation-triangle"></i>Gagal memuat bookmark.</div>';
+        }
+    }
+
+    function closeShareModal(e) {
+        if (e && e.target !== document.getElementById('shareModalOverlay')) return;
+        document.getElementById('shareModalOverlay').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    async function shareAnime(animeData) {
+        closeShareModal();
+        if (isSending) return;
+        isSending = true;
+        document.getElementById('chatSendBtn').disabled = true;
+
+        try {
+            await fetch('/api/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message:    `Cek anime ini: ${animeData.title}`,
+                    msg_type:   'anime_share',
+                    anime_data: animeData
+                })
+            });
+            if (navigator.vibrate) navigator.vibrate(20);
+            await fetchNew();
+        } catch(e) { console.warn(e); }
+
+        isSending = false;
+        document.getElementById('chatSendBtn').disabled = false;
+    }
 
     async function init() {
         const box = document.getElementById('chatMessages');
