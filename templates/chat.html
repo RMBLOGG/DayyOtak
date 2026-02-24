@@ -10,16 +10,20 @@
     ══════════════════════════════════════════ */
 
     /* Override main-content padding agar chat full-height */
-    .main-content { padding-bottom: 0 !important; }
-    .content-wrapper { padding: 0 !important; }
+    .main-content { padding-bottom: 0 !important; overflow: hidden; }
+    .content-wrapper { padding: 0 !important; overflow: hidden; }
 
-    /* ── Chat wrapper full-height ── */
+    /* ── Chat wrapper: fixed fill antara topbar & bottom-nav ── */
     .chat-wrap {
+        position: fixed;
+        top: 56px;
+        bottom: 58px;
+        left: 0;
+        right: 0;
         display: flex;
         flex-direction: column;
-        height: calc(100dvh - 56px - 58px); /* topbar + bottom-nav */
         background: var(--c-bg);
-        position: relative;
+        z-index: 10;
     }
 
     /* ── Chat header bar ── */
