@@ -979,38 +979,7 @@
             </div>
             {% endif %}
             
-            <!-- Download Section -->
-            {% if episode.downloadUrl and episode.downloadUrl.qualities %}
-            <div class="anime-section download-section">
-                <div class="section-header">
-                    <div class="section-title-wrapper">
-                        <div class="section-accent"></div>
-                        <h2 class="section-title">Download Episode</h2>
-                    </div>
-                </div>
-                
-                {% for quality in episode.downloadUrl.qualities %}
-                <div class="download-group">
-                    <div class="download-quality-header">
-                        <i class="fas fa-hdd"></i>
-                        {{ quality.title }}
-                        <span class="quality-badge">{{ quality.size }}</span>
-                    </div>
-                    <div class="download-grid">
-                        {% for link in quality.urls %}
-                        <a href="{{ link.url }}" class="download-btn" target="_blank">
-                            <i class="fas fa-download"></i>
-                            {{ link.title }}
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- ══════════════════════════════════════════
+                    <!-- ══════════════════════════════════════════
              KOMENTAR EPISODE
         ══════════════════════════════════════════ -->
         <div class="anime-section" style="margin-top:1.5rem;">
@@ -1061,6 +1030,37 @@
                     <i class="fas fa-spinner fa-spin"></i> Memuat komentar...
                 </div>
             </div>
+        </div>
+            
+            <!-- Download Section -->
+            {% if episode.downloadUrl and episode.downloadUrl.qualities %}
+            <div class="anime-section download-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <div class="section-accent"></div>
+                        <h2 class="section-title">Download Episode</h2>
+                    </div>
+                </div>
+                
+                {% for quality in episode.downloadUrl.qualities %}
+                <div class="download-group">
+                    <div class="download-quality-header">
+                        <i class="fas fa-hdd"></i>
+                        {{ quality.title }}
+                        <span class="quality-badge">{{ quality.size }}</span>
+                    </div>
+                    <div class="download-grid">
+                        {% for link in quality.urls %}
+                        <a href="{{ link.url }}" class="download-btn" target="_blank">
+                            <i class="fas fa-download"></i>
+                            {{ link.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
     {% else %}
