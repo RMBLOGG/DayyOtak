@@ -1018,6 +1018,15 @@ window.animeData = {
     status: {{ data.data.status|tojson if data.data.status else 'null' }}
 };
 
+// ── Simpan ke sessionStorage agar episode.html bisa baca poster & title ──
+try {
+    sessionStorage.setItem('currentAnime', JSON.stringify({
+        animeId: window.animeData.animeId,
+        title  : window.animeData.title,
+        poster : window.animeData.poster
+    }));
+} catch(e) {}
+
 console.log('Anime Data loaded:', window.animeData);
 </script>
 {% endif %}

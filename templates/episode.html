@@ -1187,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- ══════════════════════════════════════════
-     SAVE WATCH HISTORY (dengan poster & anime info)
+     SAVE WATCH HISTORY
 ══════════════════════════════════════════ -->
 {% if data and data.status == 'success' %}
 <script>
@@ -1197,54 +1197,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const episodeId    = {{ episode_id | tojson }};
     const episodeTitle = {{ data.data.title | tojson }};
 
-    // Ekstrak anime_id dari episode_id
-    // Contoh: "kamuy-golden-season-5-sub-indo-episode-8" → "kamuy-golden-season-5-sub-indo"
-    function extractAnimeId(epId) {
-        // Coba hapus "-episode-N" atau "-eps-N" di akhir
-        const patterns = [
-            /^(.+)-episode-\d+.*$/i,
-            /^(.+)-eps-\d+.*$/i,
-            /^(.+)-ep-\d+.*$/i,
-        ];
-        for (const pattern of patterns) {
-            const match = epId.match(pattern);
-            if (match) return match[1];
-        }
-        // Fallback: hapus segment terakhir
-        const parts = epId.split('-');
-        if (parts.length > 2) {
-            // Coba hapus 2 segment terakhir (misal: "episode" dan "8")
-            const lastTwo = parts.slice(-2);
-            if (!isNaN(lastTwo[1]) || lastTwo[0].toLowerCase() === 'episode') {
-                return parts.slice(0, -2).join('-');
-            }
-        }
-        return epId;
-    }
-
-    const animeId = extractAnimeId(episodeId);
-
-    // Simpan history setelah dapat poster dari API anime
     async function saveHistory() {
         let animePoster    = '';
         let animeTitleFull = '';
+        let animeId        = '';
 
+        // ── Prioritas 1: Ambil dari sessionStorage (dikirim dari detail.html) ──
         try {
-            // Fetch data anime untuk dapat poster & judul
-            const res  = await fetch('/api/anime/' + animeId);
-            const json = await res.json();
-
-            if (json && json.status === 'success' && json.data) {
-                animePoster    = json.data.poster    || '';
-                animeTitleFull = json.data.title     || '';
+            const stored = sessionStorage.getItem('currentAnime');
+            if (stored) {
+                const info = JSON.parse(stored);
+                animePoster    = info.poster  || '';
+                animeTitleFull = info.title   || '';
+                animeId        = info.animeId || '';
+                console.log('[History] Dari sessionStorage:', animeTitleFull, '| poster:', animePoster ? 'OK' : 'KOSONG');
             }
-        } catch (e) {
-            console.warn('Could not fetch anime data for history:', e);
+        } catch(e) {}
+
+        // ── Prioritas 2: Fallback fetch API jika sessionStorage kosong ──
+        if (!animePoster && !animeTitleFull) {
+            // Ekstrak animeId dari episodeId sebagai fallback
+            // Format: "kamuy-golden-season-5-sub-indo-episode-8" → "kamuy-golden-season-5-sub-indo"
+            // Format: "nnshbti-s3-p2-episode-7sub-indo" → "nnshbti-s3-p2-sub-indo"
+            function extractAnimeId(epId) {
+                const m = epId.match(/^(.+?)-episode-\d+(.*?)$/i);
+                if (m) {
+                    const prefix = m[1];
+                    const suffix = m[2].replace(/^-/, '').trim();
+                    return suffix ? prefix + '-' + suffix : prefix;
+                }
+                return epId.split('-episode-')[0] || epId;
+            }
+
+            if (!animeId) animeId = extractAnimeId(episodeId);
+
+            try {
+                const res  = await fetch('/api/anime/' + animeId);
+                const json = await res.json();
+                if (json && json.status === 'success' && json.data) {
+                    animePoster    = json.data.poster || '';
+                    animeTitleFull = json.data.title  || '';
+                }
+                console.log('[History] Dari API fetch:', animeTitleFull, '| poster:', animePoster ? 'OK' : 'KOSONG');
+            } catch(e) {
+                console.warn('[History] API fetch gagal:', e);
+            }
         }
 
-        // Kirim ke backend
+        // ── Simpan ke Supabase via backend ──
         try {
-            await fetch('/api/history/add', {
+            const res = await fetch('/api/history/add', {
                 method : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body   : JSON.stringify({
@@ -1255,13 +1257,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     poster       : animePoster,
                 })
             });
-            console.log('History saved:', animeTitleFull || animeId);
-        } catch (e) {
-            console.warn('Failed to save history:', e);
+            const result = await res.json();
+            console.log('[History] Saved:', result.status, '| anime:', animeTitleFull);
+        } catch(e) {
+            console.warn('[History] Gagal simpan:', e);
         }
     }
 
-    // Jalankan setelah halaman load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', saveHistory);
     } else {
