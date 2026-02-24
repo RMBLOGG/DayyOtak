@@ -692,6 +692,41 @@ def api_post_chat():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/api/chat/react/<int:msg_id>', methods=['POST'])
+@login_required
+def api_react_chat(msg_id):
+    if not supabase:
+        return jsonify({'status': 'error', 'message': 'Supabase not configured'}), 503
+
+    user  = session.get('user')
+    uid   = user.get('sub')
+    body  = request.get_json() or {}
+    emoji = body.get('emoji', '').strip()
+
+    ALLOWED = ['👍','❤️','😂','😮','😢','🔥']
+    if emoji not in ALLOWED:
+        return jsonify({'status': 'error', 'message': 'Emoji tidak valid'}), 400
+
+    try:
+        # Fetch current reactions
+        res = supabase.table('live_chat').select('reactions').eq('id', msg_id).single().execute()
+        reactions = res.data.get('reactions') or {}
+
+        users = reactions.get(emoji, [])
+        if uid in users:
+            users.remove(uid)   # toggle off
+        else:
+            users.append(uid)   # toggle on
+
+        reactions[emoji] = users
+
+        # Save back
+        supabase.table('live_chat').update({'reactions': reactions}).eq('id', msg_id).execute()
+        return jsonify({'status': 'success', 'reactions': reactions})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 @app.route('/api/chat/delete/<int:msg_id>', methods=['POST'])
 @login_required
 def api_delete_chat(msg_id):
