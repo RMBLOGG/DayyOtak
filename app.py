@@ -9,6 +9,16 @@ from io import BytesIO
 
 app = Flask(__name__)
 
+# ============ REDIRECT — WEBSITE PINDAH KE ANIMEKU.ID ============
+NEW_DOMAIN = "https://animeku-id.vercel.app"
+
+@app.before_request
+def redirect_to_new_domain():
+    # Bangun URL tujuan: domain baru + path + query string yang sama
+    new_url = NEW_DOMAIN + request.full_path.rstrip('?')
+    return redirect(new_url, code=301)
+# ================================================================
+
 # ============ SECRET KEY ============
 app.secret_key = os.environ.get('SECRET_KEY', 'fallback-dev-secret-key-change-in-production')
 
