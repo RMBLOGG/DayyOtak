@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DayyDesu — Website Telah Dipindahkan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-cyan:     #40c8ff;
+            --c-purple:   #8855ff;
+            --c-bg:       #060b16;
+            --c-grid:     rgba(64, 200, 255, 0.045);
+            --c-text:     #d8eeff;
+            --c-text-dim: rgba(160, 200, 230, 0.55);
+            --c-border:   rgba(64, 200, 255, 0.18);
+            --font-hud:   'Rajdhani', sans-serif;
+            --font-body:  'Exo 2', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--c-bg);
+            color: var(--c-text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background-image:
+                linear-gradient(var(--c-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::before {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(64,200,255,0.10), transparent 70%);
+            top: -100px; left: -100px;
+        }
+        body::after {
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(136,85,255,0.09), transparent 70%);
+            bottom: -80px; right: -80px;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+            background: linear-gradient(160deg, #0a1020 0%, #070d1c 100%);
+            border: 1px solid var(--c-border);
+            border-radius: 16px;
+            padding: 2.25rem 1.75rem 2rem;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(64,200,255,0.07), 0 24px 64px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+
+        /* Glowing top border line */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--c-purple) 30%, var(--c-cyan) 65%, transparent);
+            box-shadow: 0 0 18px rgba(64,200,255,0.45);
+        }
+
+        /* Grid texture */
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(64,200,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(64,200,255,0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            border-radius: 16px;
+        }
+
+        .inner { position: relative; z-index: 2; }
+
+        /* ── Icon ── */
+        .icon-wrap {
+            width: 68px; height: 68px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 28px rgba(64,200,255,0.35);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        .icon-wrap i { color: #fff; font-size: 1.7rem; }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 20px rgba(64,200,255,0.3); }
+            50%      { box-shadow: 0 0 40px rgba(64,200,255,0.6), 0 0 70px rgba(136,85,255,0.25); }
+        }
+
+        /* ── Badge ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.28rem 0.8rem;
+            background: rgba(255, 170, 0, 0.08);
+            border: 1px solid rgba(255, 170, 0, 0.28);
+            border-radius: 99px;
+            font-family: var(--font-hud);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #ffaa00;
+            margin-bottom: 1.1rem;
+        }
+        .badge .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #ffaa00;
+            animation: blink 1.4s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+
+        /* ── Headline ── */
+        .headline {
+            font-family: var(--font-hud);
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+            margin-bottom: 0.65rem;
+        }
+        .headline span { color: var(--c-cyan); }
+
+        /* ── Subtext ── */
+        .subtext {
+            font-size: 0.875rem;
+            color: var(--c-text-dim);
+            line-height: 1.7;
+            margin-bottom: 1.75rem;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--c-border), transparent);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── New URL box ── */
+        .url-label {
+            font-family: var(--font-hud);
+            font-size: 0.58rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--c-cyan);
+            opacity: 0.5;
+            margin-bottom: 0.5rem;
+        }
+        .url-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            padding: 0.7rem 1rem;
+            background: rgba(64,200,255,0.05);
+            border: 1px solid rgba(64,200,255,0.2);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-family: var(--font-hud);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--c-cyan);
+            word-break: break-all;
+        }
+        .url-box i { opacity: 0.55; font-size: 0.8rem; flex-shrink: 0; }
+
+        /* ── CTA Button ── */
+        .cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: var(--font-hud);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 24px rgba(64,200,255,0.28);
+            margin-bottom: 1.25rem;
+        }
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(64,200,255,0.42);
+            filter: brightness(1.08);
+        }
+
+        /* ── Countdown ── */
+        .countdown-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .countdown-text {
+            font-family: var(--font-hud);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            color: var(--c-text-dim);
+        }
+        .countdown-text b {
+            color: var(--c-cyan);
+            font-size: 1rem;
+        }
+
+        /* ── Progress bar ── */
+        .progress-wrap {
+            width: 100%;
+            height: 2px;
+            background: rgba(64,200,255,0.1);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--c-purple), var(--c-cyan));
+            border-radius: 99px;
+            width: 100%;
+            transform-origin: left;
+            transform: scaleX(0);
+            /* durasi diset via JS */
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="inner">
+
+        <div class="icon-wrap">
+            <i class="fas fa-triangle-exclamation"></i>
+        </div>
+
+        <div class="badge">
+            <span class="dot"></span>
+            Pemberitahuan Penting
+        </div>
+
+        <h1 class="headline">Website Telah<br><span>Dipindahkan</span></h1>
+
+        <p class="subtext">
+            DayyDesu kini telah berpindah ke domain baru.<br>
+            Semua konten anime tersedia lengkap di alamat berikut:
+        </p>
+
+        <div class="divider"></div>
+
+        <p class="url-label">Alamat Baru</p>
+        <div class="url-box">
+            <i class="fas fa-globe"></i>
+            animeku.id
+        </div>
+
+        <a href="{{ destination }}" class="cta-btn" id="goBtn">
+            <i class="fas fa-arrow-right"></i>
+            Pergi ke Halaman Baru
+        </a>
+
+        <div class="countdown-wrap">
+            <p class="countdown-text">
+                Otomatis pindah dalam <b id="countdown">5</b> detik...
+            </p>
+            <div class="progress-wrap">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const SECONDS = 5;
+    const dest    = {{ destination | tojson }};
+    const el      = document.getElementById('countdown');
+    const bar     = document.getElementById('progressBar');
+
+    // Jalankan animasi progress bar
+    bar.style.transition = `transform ${SECONDS}s linear`;
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            bar.style.transform = 'scaleX(1)';
+        });
+    });
+
+    let t = SECONDS;
+    const iv = setInterval(() => {
+        t--;
+        el.textContent = t;
+        if (t <= 0) {
+            clearInterval(iv);
+            window.location.href = dest;
+        }
+    }, 1000);
+</script>
+
+</body>
+  </html>
+  
